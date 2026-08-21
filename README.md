@@ -5,7 +5,7 @@
 **BYOP (Bring Your Own Pollen)** OAuth flow — you sign in with your own
 Pollinations account and spend **your own Pollen credits**.
 
-> Live demo: https://dokirong.github.io/pollen-image-studio/
+> Live demo: https://image.lanprint.com/
 
 ---
 
@@ -66,7 +66,7 @@ Open `index.html` in a browser. No dependencies to install.
 - The **Redirect URI** registered for the App Key must exactly match:
 
   ```
-  https://dokirong.github.io/pollen-image-studio/
+  https://image.lanprint.com/
   ```
 
 - Scoped `sk_` keys are never stored in source, URL, or localStorage.
