@@ -65,7 +65,7 @@
   /* ---------- 布局（左右 1:3） ---------- */
   .grid { display: grid; grid-template-columns: 1fr 3fr; gap: 22px; align-items: stretch; flex: 1 1 auto; min-height: 0; }
   /* 两栏占满高度，内容已压缩在一屏内，绝不出现滚动条（兜底裁切） */
-  .grid > div:first-child { min-height: 0; overflow: hidden; }
+  .grid > div:first-child { min-height: 0; }
   .grid > div:first-child .card { margin-bottom: 0; }
   .result-area { min-height: 0; max-height: 100%; overflow: hidden; display: flex; flex-direction: column; }
   .result-area > h2 { flex: 0 0 auto; }
@@ -107,7 +107,7 @@
     font-family: inherit;
   }
   input:focus, select:focus, textarea:focus { border-color: var(--pink); }
-  textarea { resize: vertical; min-height: 52px; line-height: 1.5; }
+  textarea { resize: vertical; min-height: 46px; line-height: 1.5; }
   .hint { font-size: 12px; color: #9a8595; margin-top: 6px; line-height: 1.5; }
 
   .key-row { display: flex; gap: 8px; align-items: center; }
@@ -152,28 +152,45 @@
   .connected .btn { margin-left: auto; }
 
   /* ---------- 模型卡片 ---------- */
-  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  /* 参考提示词卡片 + 随机按钮 */
+  .ref-row { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .ref-card {
+    border: 2px solid #e6ddf2; background: var(--card-2); border-radius: 12px;
+    padding: 8px 8px; cursor: pointer; transition: all .2s;
+    font-size: 12px; font-weight: 700; color: var(--lavender-deep);
+    display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.25;
+    min-height: 40px;
+  }
+  .ref-card:hover { background: #fbe9f2; border-color: var(--pink); color: var(--pink-deep); }
+  .random-btn { align-self: flex-start; }
+
+  /* 模型卡片：横排紧凑（前：模型名 · 后：分辨率 + 价格） */
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   @media (max-width: 480px) { .model-grid { grid-template-columns: 1fr; } }
   .model-item {
-    position: relative; padding: 9px 12px; border-radius: 12px;
+    position: relative; display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    padding: 6px 10px; border-radius: 10px;
     border: 2px solid #eee0ea; background: var(--white);
     cursor: pointer; transition: border-color .2s, background .2s;
   }
   .model-item input { display: none; }
-  .model-item .m-name { font-size: 14px; font-weight: 800; color: var(--ink); }
+  .model-item .m-name { font-size: 13px; font-weight: 800; color: var(--ink); flex: 0 0 auto; }
   .model-item .m-desc { display: none; }
-  .model-item .m-price { display: block; width: fit-content; font-size: 11px; color: var(--pink-deep); font-weight: 700; background: #ffe3ee; padding: 2px 9px; border-radius: 999px; margin-top: 6px; }
+  .model-item .m-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #9a8595; min-width: 0; overflow: hidden; }
+  .model-item .m-res { font-weight: 700; color: var(--ink-soft); flex: 0 0 auto; }
+  .model-item .m-price { flex: 0 0 auto; color: var(--pink-deep); font-weight: 700; background: #ffe3ee; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
   .model-item.selected { border-color: var(--pink-deep); background: #fff4f8; }
   .model-item.selected::after {
-    content: "已选"; position: absolute; top: -9px; right: 10px;
-    background: var(--pink-deep); color: #fff; font-size: 10px;
-    padding: 2px 8px; border-radius: 999px;
+    content: "已选"; position: absolute; top: -8px; right: 8px;
+    background: var(--pink-deep); color: #fff; font-size: 9px;
+    padding: 1px 6px; border-radius: 999px;
   }
 
   .size-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .size-chip {
     display: flex; flex-direction: column; align-items: center; gap: 1px;
-    padding: 5px 11px; border-radius: 14px; cursor: pointer;
+    padding: 4px 10px; border-radius: 14px; cursor: pointer;
     border: 2px solid #eee0ea; background: var(--white);
     transition: all .2s;
   }
@@ -181,15 +198,6 @@
   .size-chip .size-ratio { font-size: 11px; color: var(--ink-soft); font-weight: 600; line-height: 1.2; }
   .size-chip.selected { background: var(--mint); border-color: var(--mint-deep); }
   .size-chip.selected .size-dim, .size-chip.selected .size-ratio { color: #2e6b52; }
-
-  /* ---------- 示例 ---------- */
-  .ex-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .ex-chip {
-    font-size: 11px; padding: 4px 10px; border-radius: 999px;
-    background: var(--cream); color: #8a6d3b; cursor: pointer;
-    border: 1px solid #ecd9ac; transition: all .2s;
-  }
-  .ex-chip:hover { background: #f8e3b5; }
 
   /* ---------- 状态 ---------- */
   .status-bar { display: flex; align-items: center; gap: 10px; margin-top: 14px; min-height: 26px; }
@@ -323,15 +331,12 @@
         <h2><span class="dot dot-mint"></span>写下你的画面</h2>
         <label for="prompt">提示词（英文效果更佳，支持中文）</label>
         <textarea id="prompt" placeholder="例如：a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere"></textarea>
-        <div class="ex-row">
-          <span class="ex-chip" data-p="a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere">可爱猫猫</span>
-          <span class="ex-chip" data-p="a cozy pastel cottage in a flower meadow, morning light, anime style">花田小屋</span>
-          <span class="ex-chip" data-p="a delicious strawberry macaron dessert, soft studio lighting, food photography">草莓马卡龙</span>
-          <span class="ex-chip" data-p="a cute kawaii robot holding a flower, pastel colors, chibi style">治愈小机器人</span>
-          <span class="ex-chip" data-p="sakura trees along a riverside path at dusk, soft pink sky, illustration">樱花河畔</span>
+        <div class="ref-row">
+          <button class="btn btn-ghost btn-sm random-btn" id="randomBtn" type="button">随机看看</button>
+          <div class="ref-grid" id="refGrid"></div>
         </div>
 
-        <label>模型（价格约为每张图的花费）</label>
+        <label>模型（前：名称 · 后：分辨率 · 价格）</label>
         <div class="model-grid" id="modelGrid"></div>
 
         <label>尺寸</label>
@@ -424,6 +429,13 @@
     { id: 'nova-canvas',name: 'nova-canvas',price: 0.04,   desc: '创意画布，风格鲜明' },
     { id: 'custom',     name: '自定义模型',  price: null,   desc: '输入 /v1/models 中的其他模型 ID' }
   ];
+
+  var REF_PROMPTS = [
+    { title: '数学信息图', p: '高中二年级数学全部知识信息图' },
+    { title: '开发信息图', p: '游戏开发策划运营信息图' },
+    { title: '美术武侠图', p: '满脸沧桑的游侠，目光锐利，凌乱发丝，横着剑身金粉弥散，暗黑风格，构图采用黄金分割，强化人物情感，负空间策略性地烘托侠客的孤独与坚定。电影级高分辨率、大师级摄影、超现实细节、顶级影视海报美术平面设计艺术感' }
+  ];
+
   var SIZES = ['512x512', '768x768', '1024x1024', '768x1024', '1024x768', '512x768', '768x512', '1536x1024', '1024x576', '1536x864', '576x1024', '864x1536'];
 
   var state = {
@@ -458,6 +470,7 @@
 
     buildModelGrid();
     buildSizeRow();
+    buildRefGrid();
 
     genBtn.addEventListener('click', onGenerate);
     $('toggleKey').addEventListener('click', function () {
@@ -469,11 +482,10 @@
     startOAuthBtn.addEventListener('click', startOAuth);
     disconnectBtn.addEventListener('click', disconnect);
 
-    document.querySelectorAll('.ex-chip').forEach(function (el) {
-      el.addEventListener('click', function () {
-        promptEl.value = el.getAttribute('data-p');
-        promptEl.focus();
-      });
+    $('randomBtn').addEventListener('click', function () {
+      var it = REF_PROMPTS[Math.floor(Math.random() * REF_PROMPTS.length)];
+      promptEl.value = it.p;
+      promptEl.focus();
     });
 
     // 未连接且不是 OAuth 回调页 -> 载入即弹出登录模态框
@@ -488,37 +500,43 @@
   // ---------------- 模型 / 尺寸 UI ----------------
   function buildModelGrid() {
     var grid = $('modelGrid');
+    grid.innerHTML = '';
+    var resStr = state.size.replace('x', '×');
     MODELS.forEach(function (m) {
       var label = document.createElement('label');
       label.className = 'model-item' + (m.id === state.model ? ' selected' : '');
       label.dataset.id = m.id;
       var priceHtml = m.price !== null
-        ? '<div class="m-price">约 ' + m.price + ' ' + (m.unit || 'pollen') + '/张</div>'
-        : '<div class="m-price" style="background:#e7e0f5;color:#7c63c9;">按模型定价</div>';
+        ? '约 ' + m.price + ' ' + (m.unit || 'pollen') + '/张'
+        : '按模型定价';
       label.innerHTML =
         '<input type="radio" name="model" value="' + m.id + '"' + (m.id === state.model ? ' checked' : '') + '>' +
-        '<div class="m-name">' + m.name + '</div>' +
-        priceHtml +
-        '<div class="m-desc">' + m.desc + '</div>';
+        '<span class="m-name">' + m.name + '</span>' +
+        '<span class="m-meta"><span class="m-res">' + resStr + '</span><span class="m-price">' + priceHtml + '</span></span>';
       label.addEventListener('click', function () {
         document.querySelectorAll('.model-item').forEach(function (x) { x.classList.remove('selected'); });
         label.classList.add('selected');
         state.model = m.id;
-        var customWrap = $('customModelWrap');
-        if (m.id === 'custom') {
-          if (!customWrap) {
-            var wrap = document.createElement('div');
-            wrap.id = 'customModelWrap';
-            wrap.innerHTML = '<label for="customModel">模型 ID</label><input type="text" id="customModel" placeholder="例如 rodrigookk/z-image-turbo">';
-            grid.appendChild(wrap);
-            $('customModel').addEventListener('input', function () { state.customModel = this.value.trim(); });
-          }
-        } else if (customWrap) {
-          customWrap.remove();
-        }
+        toggleCustomModel(m.id, grid);
       });
       grid.appendChild(label);
     });
+  }
+
+  function toggleCustomModel(id, grid) {
+    var customWrap = $('customModelWrap');
+    if (id === 'custom') {
+      if (!customWrap) {
+        var wrap = document.createElement('div');
+        wrap.id = 'customModelWrap';
+        wrap.style.marginTop = '6px';
+        wrap.innerHTML = '<label for="customModel">模型 ID</label><input type="text" id="customModel" placeholder="例如 rodrigookk/z-image-turbo">';
+        grid.appendChild(wrap);
+        $('customModel').addEventListener('input', function () { state.customModel = this.value.trim(); });
+      }
+    } else if (customWrap) {
+      customWrap.remove();
+    }
   }
 
   function sizeRatio(s) {
@@ -537,7 +555,7 @@
       chip.className = 'size-chip' + (s === state.size ? ' selected' : '');
       var dim = document.createElement('span');
       dim.className = 'size-dim';
-      dim.textContent = s;
+      dim.textContent = s.replace('x', '×');
       var r = document.createElement('span');
       r.className = 'size-ratio';
       r.textContent = sizeRatio(s);
@@ -547,8 +565,25 @@
         document.querySelectorAll('.size-chip').forEach(function (x) { x.classList.remove('selected'); });
         chip.classList.add('selected');
         state.size = s;
+        var resStr = s.replace('x', '×');
+        document.querySelectorAll('.model-item .m-res').forEach(function (el) { el.textContent = resStr; });
       });
       row.appendChild(chip);
+    });
+  }
+
+  function buildRefGrid() {
+    var g = $('refGrid');
+    REF_PROMPTS.forEach(function (it) {
+      var c = document.createElement('div');
+      c.className = 'ref-card';
+      c.textContent = it.title;
+      c.title = it.p;
+      c.addEventListener('click', function () {
+        promptEl.value = it.p;
+        promptEl.focus();
+      });
+      g.appendChild(c);
     });
   }
 
