@@ -64,10 +64,10 @@
 
   /* ---------- 布局（左右 1:3） ---------- */
   .grid { display: grid; grid-template-columns: 1fr 3fr; gap: 22px; align-items: stretch; flex: 1 1 auto; min-height: 0; }
-  /* 两栏各自在列内滚动，整个页面保持 100vh 不滚动 */
-  .grid > div:first-child { min-height: 0; overflow-y: auto; padding-right: 6px; }
+  /* 两栏占满高度，内容已压缩在一屏内，绝不出现滚动条（兜底裁切） */
+  .grid > div:first-child { min-height: 0; overflow: hidden; }
   .grid > div:first-child .card { margin-bottom: 0; }
-  .result-area { min-height: 0; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; }
+  .result-area { min-height: 0; max-height: 100%; overflow: hidden; display: flex; flex-direction: column; }
   .result-area > h2 { flex: 0 0 auto; }
   #resultBox { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
   @media (max-width: 880px) {
@@ -81,8 +81,8 @@
     background: var(--card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 20px 22px;
-    margin-bottom: 20px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
   }
   .card h2 {
     font-size: 16px; color: var(--ink);
@@ -97,7 +97,7 @@
   .dot-mint { background: var(--mint-deep); }
   .dot-lav { background: var(--lavender-deep); }
 
-  label { font-size: 13px; color: var(--ink-soft); display: block; margin: 12px 0 6px; font-weight: 600; }
+  label { font-size: 13px; color: var(--ink-soft); display: block; margin: 8px 0 5px; font-weight: 600; }
   input[type="text"], input[type="password"], input[type="number"], select, textarea {
     width: 100%; padding: 11px 13px;
     border: 2px solid #eee0ea; border-radius: 12px;
@@ -107,7 +107,7 @@
     font-family: inherit;
   }
   input:focus, select:focus, textarea:focus { border-color: var(--pink); }
-  textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
+  textarea { resize: vertical; min-height: 52px; line-height: 1.5; }
   .hint { font-size: 12px; color: #9a8595; margin-top: 6px; line-height: 1.5; }
 
   .key-row { display: flex; gap: 8px; align-items: center; }
@@ -152,17 +152,17 @@
   .connected .btn { margin-left: auto; }
 
   /* ---------- 模型卡片 ---------- */
-  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   @media (max-width: 480px) { .model-grid { grid-template-columns: 1fr; } }
   .model-item {
-    position: relative; padding: 12px 14px; border-radius: 14px;
+    position: relative; padding: 9px 12px; border-radius: 12px;
     border: 2px solid #eee0ea; background: var(--white);
     cursor: pointer; transition: border-color .2s, background .2s;
   }
   .model-item input { display: none; }
-  .model-item .m-name { font-size: 17px; font-weight: 800; color: var(--ink); }
-  .model-item .m-desc { font-size: 12px; color: #9a8595; margin-top: 6px; line-height: 1.4; }
-  .model-item .m-price { display: block; width: fit-content; font-size: 12px; color: var(--pink-deep); font-weight: 700; background: #ffe3ee; padding: 3px 10px; border-radius: 999px; margin-top: 10px; }
+  .model-item .m-name { font-size: 14px; font-weight: 800; color: var(--ink); }
+  .model-item .m-desc { display: none; }
+  .model-item .m-price { display: block; width: fit-content; font-size: 11px; color: var(--pink-deep); font-weight: 700; background: #ffe3ee; padding: 2px 9px; border-radius: 999px; margin-top: 6px; }
   .model-item.selected { border-color: var(--pink-deep); background: #fff4f8; }
   .model-item.selected::after {
     content: "已选"; position: absolute; top: -9px; right: 10px;
@@ -170,22 +170,22 @@
     padding: 2px 8px; border-radius: 999px;
   }
 
-  .size-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .size-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .size-chip {
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-    padding: 7px 14px; border-radius: 16px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    padding: 5px 11px; border-radius: 14px; cursor: pointer;
     border: 2px solid #eee0ea; background: var(--white);
     transition: all .2s;
   }
-  .size-chip .size-dim { font-size: 13px; color: var(--ink); font-weight: 700; line-height: 1.2; }
+  .size-chip .size-dim { font-size: 12px; color: var(--ink); font-weight: 700; line-height: 1.2; }
   .size-chip .size-ratio { font-size: 11px; color: var(--ink-soft); font-weight: 600; line-height: 1.2; }
   .size-chip.selected { background: var(--mint); border-color: var(--mint-deep); }
   .size-chip.selected .size-dim, .size-chip.selected .size-ratio { color: #2e6b52; }
 
   /* ---------- 示例 ---------- */
-  .ex-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .ex-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .ex-chip {
-    font-size: 12px; padding: 6px 12px; border-radius: 999px;
+    font-size: 11px; padding: 4px 10px; border-radius: 999px;
     background: var(--cream); color: #8a6d3b; cursor: pointer;
     border: 1px solid #ecd9ac; transition: all .2s;
   }
@@ -210,7 +210,7 @@
   }
   .placeholder svg { opacity: .55; }
   .img-box { position: relative; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
-  .img-box img { max-width: 100%; max-height: calc(100vh - 230px); display: block; margin: 0 auto; border-radius: 14px; }
+  .img-box img { max-width: 100%; max-height: calc(100vh - 340px); display: block; margin: 0 auto; border-radius: 14px; }
   .img-meta { margin-top: 10px; font-size: 12px; color: #9a8595; line-height: 1.6; word-break: break-all; }
   .result-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
   .model-tag { display: inline-block; font-size: 12px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--pink-deep), var(--lavender-deep)); padding: 4px 10px; border-radius: 999px; }
