@@ -194,7 +194,7 @@
   .model-item .m-price { flex: 0 0 auto; color: var(--pink-deep); font-weight: 700; background: #ffe3ee; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
   .model-item.selected { border-color: var(--pink-deep); background: #fff4f8; }
   .model-item.selected::after {
-    content: "已选"; position: absolute; top: -8px; right: 8px;
+    content: attr(data-selected); position: absolute; top: -8px; right: 8px;
     background: var(--pink-deep); color: #fff; font-size: 9px;
     padding: 1px 6px; border-radius: 999px;
   }
@@ -502,7 +502,7 @@
       labelPrompt: '提示词', btnLang: '中文', btnGen: '生成图片', btnGenBusy: '生成中，请稍候…', btnTrans: '智能转换中…',
       modalTitle: '登录以开始创作', modalDesc: '使用你的 Pollinations 账户完成官方 BYOP 授权，即可用你自己的 Pollen 额度生成图片。限权密钥仅保存在本次会话，可随时在后台撤销。', btnOAuth: '授权并连接',
       toastNoKey: '请先连接账户（官方授权）或填写 sk_ 密钥', toastNoPrompt: '请先填写提示词', toastNoModel: '请填写自定义模型 ID', toastDisconnected: '已退出连接',
-      connSub: '已通过官方 BYOP 授权连接', connSubPlain: '限权密钥生效中（本次会话）', exit: '退出连接',
+      connSub: '已通过官方 BYOP 授权连接', connSubPlain: '限权密钥生效中（本次会话）', exit: '退出连接', connectedName: '已连接',
       placeholder: '例如：a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere',
       resultTitle: '生成结果', noResult: '还没有生成图片，在左侧填写提示词后点击「生成图片」即可。', writePrompt: '写下你的画面',
       transBadge: '已自动译英', loading: '正在创作你的画面，请稍候…', loadingWarn: '生成通常需要 10~60 秒，请勿关闭页面',
@@ -517,13 +517,15 @@
       sizeHint: '模型支持 256x256 ~ 2048x2048，超大尺寸可能被模型限制或耗时更长。',
       byopSummary: '或：直接粘贴 sk_ 密钥（仅开发 / 自用，非官方推荐）', apiKeyLabel: 'API Key（sk_ 开头）', apiKeyPh: '粘贴 sk_ 密钥，仅存本机浏览器', keyNotSet: '未填写。', keySaved: '密钥已保存到本机浏览器（备用路径）。', byopHint: '前端直接放 sk_ 主密钥不安全，生产环境请改用上面的官方 BYOP 授权。',
       dlBtn: '下载图片', regenBtn: '换一张', imgMetaPrefix: '尺寸', promptLabelMeta: '提示词：', autoTranslated: '已自动译成英文（基于所在地区）', origPrompt: '原文：', transPrompt: '译文：',
-      modelTag: '模型', done: '生成于'
+      modelTag: '模型', done: '生成于',
+      selectedTag: '已选', oauthGo: '正在跳转到 Pollinations 同意页，请用你的账户完成授权…', oauthExchanging: '正在用授权码换取密钥…',
+      oauthOk: '已连接。生成时使用的是你授权的限权密钥（本次会话有效）。'
     },
     en: {
       labelPrompt: 'Prompt', btnLang: 'EN', btnGen: 'Generate', btnGenBusy: 'Generating…', btnTrans: 'Translating…',
       modalTitle: 'Sign in to start', modalDesc: 'Authorize with your Pollinations account via official BYOP to generate images with your own Pollen credits. The scoped key is kept only for this session and can be revoked anytime.', btnOAuth: 'Authorize & Connect',
       toastNoKey: 'Please connect your account (official auth) or enter an sk_ key', toastNoPrompt: 'Please enter a prompt', toastNoModel: 'Please enter a custom model ID', toastDisconnected: 'Disconnected',
-      connSub: 'Connected via official BYOP', connSubPlain: 'Scoped key active (this session)', exit: 'Disconnect',
+      connSub: 'Connected via official BYOP', connSubPlain: 'Scoped key active (this session)', exit: 'Disconnect', connectedName: 'Connected',
       placeholder: 'e.g. a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere',
       resultTitle: 'Result', noResult: 'Nothing generated yet. Fill in a prompt on the left and click Generate.', writePrompt: 'Describe your image',
       transBadge: 'Auto-translated to EN', loading: 'Creating your image…', loadingWarn: 'Usually takes 10-60s. Keep this page open.',
@@ -538,7 +540,9 @@
       sizeHint: 'Models support 256x256 ~ 2048x2048; very large sizes may be limited or slower.',
       byopSummary: 'Or paste an sk_ key (dev / personal use only, not officially recommended)', apiKeyLabel: 'API Key (sk_ …)', apiKeyPh: 'Paste sk_ key, kept only in this browser', keyNotSet: 'Not set.', keySaved: 'Key saved in this browser (fallback path).', byopHint: 'Exposing a full sk_ key in frontend is unsafe; use the official BYOP authorization above in production.',
       dlBtn: 'Download', regenBtn: 'Regenerate', imgMetaPrefix: 'Size', promptLabelMeta: 'Prompt: ', autoTranslated: 'Auto-translated to English (based on your region)', origPrompt: 'Original: ', transPrompt: 'Translated: ',
-      modelTag: 'Model', done: 'at'
+      modelTag: 'Model', done: 'at',
+      selectedTag: 'Selected', oauthGo: 'Redirecting to the Pollinations consent page — authorize with your account…', oauthExchanging: 'Exchanging the authorization code for a key…',
+      oauthOk: 'Connected. Generation uses your authorized scoped key (valid for this session).'
     }
   };
   var uiLang = localStorage.getItem(LANG_STORE) === 'en' ? 'en' : 'zh';
@@ -557,6 +561,7 @@
     if ($('writeTitle')) $('writeTitle').textContent = L.writePrompt;
     if (transNote) { transNote.textContent = L.transBadge; if (translated) transNote.style.display = ''; }
     if (connSub) connSub.textContent = L.connSub;
+    if (disconnectBtn) disconnectBtn.textContent = L.exit;
     if ($('placeholderBox')) $('placeholderBox').innerHTML = L.noResult;
     if ($('randomBtn')) $('randomBtn').textContent = L.randomBtn;
     var tk = $('toggleKey');
@@ -630,6 +635,7 @@
       var label = document.createElement('label');
       label.className = 'model-item' + (m.id === state.model ? ' selected' : '');
       label.dataset.id = m.id;
+      if (m.id === state.model) label.dataset.selected = t('selectedTag');
       var priceHtml = m.price !== null
         ? t('ricePrefix') + ' ' + m.price + ' ' + (m.unit || 'pollen') + t('pricePer')
         : t('bdPrice');
@@ -638,8 +644,9 @@
         '<span class="m-name">' + modelName(m.id) + '</span>' +
         '<span class="m-meta"><span class="m-res">' + resStr + '</span><span class="m-price">' + priceHtml + '</span></span>';
       label.addEventListener('click', function () {
-        document.querySelectorAll('.model-item').forEach(function (x) { x.classList.remove('selected'); });
+        document.querySelectorAll('.model-item').forEach(function (x) { x.classList.remove('selected'); x.removeAttribute('data-selected'); });
         label.classList.add('selected');
+        label.dataset.selected = t('selectedTag');
         state.model = m.id;
         toggleCustomModel(m.id, grid);
       });
@@ -738,17 +745,17 @@
     if (m) m.classList.add('hidden');
   }
 
-  // 已连接状态展示
+  // 已连接状态展示（文案走当前语言）
   function showConnected(ui) {
     connectedBox.style.display = '';
     hideLoginModal();
     if (ui && ui.preferred_username) {
       connName.textContent = '@' + ui.preferred_username;
-      connSub.textContent = '已通过官方 BYOP 授权连接';
+      connSub.textContent = t('connSub');
       if (ui.picture) connAvatar.src = ui.picture; else connAvatar.style.display = 'none';
     } else {
-      connName.textContent = '已连接';
-      connSub.textContent = '限权密钥生效中（本次会话）';
+      connName.textContent = t('connectedName');
+      connSub.textContent = t('connSubPlain');
       connAvatar.style.display = 'none';
     }
   }
@@ -759,8 +766,8 @@
     sessionStorage.removeItem(PKCE_STATE);
     sessionStorage.removeItem(PKCE_CLIENT);
     connectedBox.style.display = 'none';
-    oauthHint.textContent = '已退出连接。';
-    toast('已退出连接');
+    oauthHint.textContent = t('toastDisconnected');
+    toast(t('toastDisconnected'));
     showLoginModal();
   }
 
@@ -1005,7 +1012,7 @@
     sessionStorage.setItem(PKCE_STATE, stateVal);
     sessionStorage.setItem(PKCE_CLIENT, pk);
 
-    oauthHint.textContent = '正在跳转到 Pollinations 同意页，请用你的账户完成授权…';
+    oauthHint.textContent = t('oauthGo');
 
     sha256(verifier).then(function (digest) {
       var challenge = base64url(digest);
@@ -1057,7 +1064,7 @@
       return;
     }
 
-    oauthHint.textContent = '正在用授权码换取密钥…';
+    oauthHint.textContent = t('oauthExchanging');
 
     var body = new URLSearchParams({
       grant_type: 'authorization_code',
@@ -1089,7 +1096,7 @@
       if (ui) sessionStorage.setItem(USERINFO_STORE, JSON.stringify(ui));
       showConnected(ui);
       toast('官方 BYOP 授权成功，已连接你的账户');
-      oauthHint.textContent = '已连接。生成时使用的是你授权的限权密钥（本次会话有效）。';
+      oauthHint.textContent = t('oauthOk');
     })
     .catch(function (err) {
       toast('授权失败：' + err.message);
