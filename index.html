@@ -55,16 +55,24 @@
     text-shadow: 0 2px 10px rgba(0,0,0,.35);
   }
   .logo-text .sub { color: #d9c8de; font-size: 13px; margin-top: 8px; letter-spacing: 1px; }
-  .topbar-login { flex: 0 0 auto; max-width: 380px; min-width: 240px; }
-  .topbar-login .connected { margin-top: 0; }
+  /* 语言切换按钮（登录框左侧） */
+  .lang-btn {
+    flex: 0 0 auto; border: 2px solid rgba(255,255,255,.25); border-radius: 999px;
+    background: rgba(255,255,255,.12); color: #fff; cursor: pointer;
+    font-size: 12px; font-weight: 700; padding: 7px 14px; letter-spacing: .5px;
+    transition: all .2s;
+  }
+  .lang-btn:hover { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.5); }
+  .topbar-login { flex: 0 0 auto; max-width: 380px; min-width: 240px; display: flex; align-items: center; gap: 12px; }
+  .topbar-login .connected { margin-top: 0; flex: 1 1 auto; }
   @media (max-width: 720px) {
     .topbar { flex-direction: column; align-items: stretch; }
     .topbar-login { max-width: none; width: 100%; }
   }
 
   /* ---------- 布局（左右 1:3） ---------- */
-  .grid { display: grid; grid-template-columns: 1fr 3fr; gap: 22px; align-items: stretch; flex: 1 1 auto; min-height: 0; }
-  /* 两栏占满高度，内容已压缩在一屏内，绝不出现滚动条（兜底裁切） */
+  .grid { display: grid; grid-template-columns: 1fr 3fr; grid-template-rows: 1fr; gap: 22px; align-items: stretch; flex: 1 1 auto; min-height: 0; }
+  /* 两栏等高，各自内部自适应 */
   .grid > div:first-child { min-height: 0; }
   .grid > div:first-child .card { margin-bottom: 0; }
   .result-area { min-height: 0; max-height: 100%; overflow: hidden; display: flex; flex-direction: column; }
@@ -316,6 +324,8 @@
     </div>
 
     <div class="topbar-login">
+      <!-- 语言切换（登录框左侧） -->
+      <button class="lang-btn" id="langBtn" type="button">中文</button>
       <!-- 已连接状态（登录后显示） -->
       <div class="connected" id="connectedBox" style="display:none;">
         <img id="connAvatar" alt="">
@@ -336,18 +346,18 @@
     <!-- ============ 左：创作（窄栏，比例 1） ============ -->
     <div>
       <div class="card">
-        <h2><span class="dot dot-mint"></span>写下你的画面</h2>
-        <label for="prompt">提示词<span class="trans-note" id="transNote" style="display:none"></span></label>
+        <h2 id="writeTitle"><span class="dot dot-mint"></span>写下你的画面</h2>
+        <label for="prompt" id="promptLabel">提示词<span class="trans-note" id="transNote" style="display:none"></span></label>
         <textarea id="prompt" placeholder="例如：a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere"></textarea>
         <div class="ref-row">
           <button class="btn btn-ghost btn-sm random-btn" id="randomBtn" type="button">随机看看</button>
           <div class="ref-grid" id="refGrid"></div>
         </div>
 
-        <label>模型（前：名称 · 后：分辨率 · 价格）</label>
+        <label id="modelLabelEl">模型（前：名称 · 后：分辨率 · 价格）</label>
         <div class="model-grid" id="modelGrid"></div>
 
-        <label>尺寸</label>
+        <label id="sizeLabelEl">尺寸</label>
         <div class="size-row" id="sizeRow"></div>
         <div class="hint">模型支持 256x256 ~ 2048x2048，超大尺寸可能被模型限制或耗时更长。</div>
 
@@ -373,8 +383,8 @@
 
     <!-- ============ 右：结果（宽栏，比例 3） ============ -->
     <div class="card result-area">
-      <h2><span class="dot dot-lav"></span>生成结果</h2>
-      <div id="resultBox"></div>
+      <h2 id="resultTitle"><span class="dot dot-lav"></span>生成结果</h2>
+      <div id="resultBox"><div class="placeholder" id="placeholderBox">还没有生成图片，在左侧填写提示词后点击「生成图片」即可。</div></div>
     </div>
 
   </div>
@@ -469,6 +479,50 @@
   // 固定的回调地址（与 App Key 登记的 Redirect URI 完全一致，写死避免本地/线上计算不一致）
   var REDIRECT_URI = 'https://dokirong.github.io/pollen-image-studio/';
 
+  // ---------------- 界面语言切换（顶部按钮，中/英） ----------------
+  var LANG_STORE = 'pollen_lang';
+  var I18N = {
+    zh: {
+      labelPrompt: '提示词', btnLang: '中文', btnGen: '生成图片', btnGenBusy: '生成中，请稍候…', btnTrans: '智能转换中…',
+      modalTitle: '登录以开始创作', modalDesc: '使用你的 Pollinations 账户完成官方 BYOP 授权，即可用你自己的 Pollen 额度生成图片。限权密钥仅保存在本次会话，可随时在后台撤销。', btnOAuth: '授权并连接',
+      toastNoKey: '请先连接账户（官方授权）或填写 sk_ 密钥', toastNoPrompt: '请先填写提示词', toastNoModel: '请填写自定义模型 ID', toastDisconnected: '已退出连接',
+      connSub: '已通过官方 BYOP 授权连接', connSubPlain: '限权密钥生效中（本次会话）', exit: '退出连接',
+      placeholder: '例如：a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere',
+      resultTitle: '生成结果', noResult: '还没有生成图片，在左侧填写提示词后点击「生成图片」即可。', writePrompt: '写下你的画面',
+      transBadge: '已自动译英', loading: '正在创作你的画面，请稍候…', loadingWarn: '生成通常需要 10~60 秒，请勿关闭页面',
+      genErr: '生成失败：', modelLabel: '模型（前：名称 · 后：分辨率 · 价格）', sizeLabel: '尺寸'
+    },
+    en: {
+      labelPrompt: 'Prompt', btnLang: 'EN', btnGen: 'Generate', btnGenBusy: 'Generating…', btnTrans: 'Translating…',
+      modalTitle: 'Sign in to start', modalDesc: 'Authorize with your Pollinations account via official BYOP to generate images with your own Pollen credits. The scoped key is kept only for this session and can be revoked anytime.', btnOAuth: 'Authorize & Connect',
+      toastNoKey: 'Please connect your account (official auth) or enter an sk_ key', toastNoPrompt: 'Please enter a prompt', toastNoModel: 'Please enter a custom model ID', toastDisconnected: 'Disconnected',
+      connSub: 'Connected via official BYOP', connSubPlain: 'Scoped key active (this session)', exit: 'Disconnect',
+      placeholder: 'e.g. a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere',
+      resultTitle: 'Result', noResult: 'Nothing generated yet. Fill in a prompt on the left and click Generate.', writePrompt: 'Describe your image',
+      transBadge: 'Auto-translated to EN', loading: 'Creating your image…', loadingWarn: 'Usually takes 10-60s. Keep this page open.',
+      genErr: 'Generation failed: ', modelLabel: 'Models (name · size · price)', sizeLabel: 'Size'
+    }
+  };
+  var uiLang = localStorage.getItem(LANG_STORE) === 'en' ? 'en' : 'zh';
+  function t(key) { return (I18N[uiLang] && I18N[uiLang][key]) || key; }
+  function applyLang() {
+    var L = I18N[uiLang];
+    if ($('langBtn')) $('langBtn').textContent = L.btnLang;
+    if (promptEl) { var pH = $('promptLabel'); if (pH) pH.innerHTML = '<span class="lang-prompt">' + L.labelPrompt + '</span>'; promptEl.placeholder = L.placeholder; }
+    if (genBtn) { if (!state.generating) genBtn.textContent = L.btnGen; else genBtn.textContent = L.btnGenBusy; }
+    if ($('sizeLabelEl')) $('sizeLabelEl').textContent = L.sizeLabel;
+    if ($('modelLabelEl')) $('modelLabelEl').textContent = L.modelLabel;
+    if ($('modalTitle')) $('modalTitle').textContent = L.modalTitle;
+    if ($('modalDesc')) $('modalDesc').textContent = L.modalDesc;
+    if (startOAuthBtn) startOAuthBtn.textContent = L.btnOAuth;
+    if ($('resultTitle')) $('resultTitle').textContent = L.resultTitle;
+    if ($('writeTitle')) $('writeTitle').textContent = L.writePrompt;
+    if (transNote) { transNote.textContent = L.transBadge; if (translated) transNote.style.display = ''; }
+    if (connSub) connSub.textContent = L.connSub;
+    if ($('placeholderBox')) $('placeholderBox').innerHTML = L.noResult;
+    document.title = uiLang === 'en' ? 'Pollen Image Studio' : 'Pollen 生图工坊';
+  }
+
   // ---------------- 初始化 ----------------
   function init() {
     var scoped = sessionStorage.getItem(SCOPED_STORE);
@@ -498,6 +552,14 @@
       promptEl.value = it.p;
       promptEl.focus();
     });
+
+    // 语言切换
+    $('langBtn').addEventListener('click', function () {
+      uiLang = uiLang === 'zh' ? 'en' : 'zh';
+      localStorage.setItem(LANG_STORE, uiLang);
+      applyLang();
+    });
+    applyLang();
 
     // 未连接且不是 OAuth 回调页 -> 载入即弹出登录模态框
     if (!scoped && !new URLSearchParams(location.search).get('code')) {
@@ -838,8 +900,8 @@
     resultBox.innerHTML =
       '<div class="loading show">' +
         '<div class="spinner"></div>' +
-        '<p>正在创作你的画面，请稍候…</p>' +
-        '<p class="warn">生成通常需要 10~60 秒，请勿关闭页面</p>' +
+        '<p>' + t('loading') + '</p>' +
+        '<p class="warn">' + t('loadingWarn') + '</p>' +
       '</div>';
   }
 
