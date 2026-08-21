@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pollen 生图工坊</title>
+<style>
+  :root {
+    --bg-1: #2e2433;
+    --bg-2: #3b2f40;
+    --card: #fff7f0;
+    --card-2: #fdeef4;
+    --pink: #f7a8c4;
+    --pink-deep: #e8799f;
+    --mint: #a8e6cf;
+    --mint-deep: #5cc9a3;
+    --lavender: #cfc3ee;
+    --lavender-deep: #9d86e0;
+    --cream: #fdf0d5;
+    --ink: #4a3645;
+    --ink-soft: #6e5568;
+    --white: #ffffff;
+    --radius: 18px;
+    --shadow: 0 10px 30px rgba(0,0,0,.22);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    min-height: 100vh;
+    color: var(--ink);
+    padding: 28px 18px 60px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  /* ---------- 顶部 ---------- */
+  header { text-align: center; margin-bottom: 26px; }
+  .logo-row { display: inline-flex; align-items: center; gap: 12px; }
+  .logo-badge {
+    width: 52px; height: 52px; border-radius: 16px;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--lavender-deep) 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow);
+  }
+  header h1 {
+    font-size: 30px; color: #fff;
+    letter-spacing: 2px; font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0,0,0,.35);
+  }
+  header .sub { color: #d9c8de; font-size: 13px; margin-top: 8px; letter-spacing: 1px; }
+
+  /* ---------- 布局 ---------- */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 16px; color: var(--ink);
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .card h2 .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    flex: 0 0 auto;
+  }
+  .dot-pink { background: var(--pink-deep); }
+  .dot-mint { background: var(--mint-deep); }
+  .dot-lav { background: var(--lavender-deep); }
+
+  label { font-size: 13px; color: var(--ink-soft); display: block; margin: 12px 0 6px; font-weight: 600; }
+  input[type="text"], input[type="password"], select, textarea {
+    width: 100%; padding: 11px 13px;
+    border: 2px solid #eee0ea; border-radius: 12px;
+    font-size: 14px; color: var(--ink);
+    background: var(--white); outline: none;
+    transition: border-color .2s;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--pink); }
+  textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+  .hint { font-size: 12px; color: #9a8595; margin-top: 6px; line-height: 1.5; }
+
+  .key-row { display: flex; gap: 8px; align-items: center; }
+  .key-row input { flex: 1; }
+
+  /* ---------- 按钮 ---------- */
+  .btn {
+    border: none; cursor: pointer; font-family: inherit;
+    padding: 11px 18px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--pink-deep), var(--lavender-deep));
+    color: #fff; box-shadow: 0 6px 18px rgba(232,121,159,.4);
+  }
+  .btn-primary:hover { box-shadow: 0 8px 24px rgba(157,134,224,.5); }
+  .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+  .btn-soft { background: var(--card-2); color: var(--ink); border: 2px solid #f3d3e0; }
+  .btn-soft:hover { background: #fbe3ed; }
+  .btn-ghost { background: transparent; color: var(--lavender-deep); border: 2px dashed var(--lavender); padding: 8px 12px; font-size: 13px; }
+  .btn-ghost:hover { border-color: var(--lavender-deep); }
+  .btn-block { width: 100%; margin-top: 18px; padding: 14px; font-size: 16px; letter-spacing: 2px; }
+  .btn-sm { padding: 8px 14px; font-size: 13px; }
+
+  /* ---------- 模型卡片 ---------- */
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 480px) { .model-grid { grid-template-columns: 1fr; } }
+  .model-item {
+    position: relative; padding: 12px 14px; border-radius: 14px;
+    border: 2px solid #eee0ea; background: var(--white);
+    cursor: pointer; transition: border-color .2s, background .2s;
+  }
+  .model-item input { display: none; }
+  .model-item .m-name { font-size: 14px; font-weight: 700; color: var(--ink); display: flex; justify-content: space-between; align-items: center; }
+  .model-item .m-desc { font-size: 12px; color: #9a8595; margin-top: 4px; line-height: 1.4; }
+  .model-item .m-price { font-size: 11px; color: var(--pink-deep); font-weight: 700; background: #ffe3ee; padding: 2px 8px; border-radius: 999px; }
+  .model-item.selected { border-color: var(--pink-deep); background: #fff4f8; }
+  .model-item.selected::after {
+    content: "已选"; position: absolute; top: -9px; right: 10px;
+    background: var(--pink-deep); color: #fff; font-size: 10px;
+    padding: 2px 8px; border-radius: 999px;
+  }
+
+  .size-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .size-chip {
+    padding: 8px 14px; border-radius: 999px; cursor: pointer;
+    border: 2px solid #eee0ea; background: var(--white);
+    font-size: 13px; color: var(--ink-soft); font-weight: 600;
+    transition: all .2s;
+  }
+  .size-chip.selected { background: var(--mint); border-color: var(--mint-deep); color: #2e6b52; }
+
+  /* ---------- 示例 ---------- */
+  .ex-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .ex-chip {
+    font-size: 12px; padding: 6px 12px; border-radius: 999px;
+    background: var(--cream); color: #8a6d3b; cursor: pointer;
+    border: 1px solid #ecd9ac; transition: all .2s;
+  }
+  .ex-chip:hover { background: #f8e3b5; }
+
+  /* ---------- 状态 ---------- */
+  .status-bar { display: flex; align-items: center; gap: 10px; margin-top: 14px; min-height: 26px; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+  .st-ok { background: var(--mint-deep); }
+  .st-bad { background: #e8606c; }
+  .st-idle { background: #c9b8c6; }
+  .st-text { font-size: 12px; color: var(--ink-soft); }
+
+  /* ---------- 结果 ---------- */
+  .result-area { min-height: 300px; }
+  .placeholder {
+    border: 2px dashed #e8d8e2; border-radius: 14px;
+    min-height: 260px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    color: #b49fa9; font-size: 14px; background: var(--card-2);
+    text-align: center; padding: 20px;
+  }
+  .placeholder svg { opacity: .55; }
+  .img-box { position: relative; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .img-box img { width: 100%; display: block; }
+  .img-meta { margin-top: 10px; font-size: 12px; color: #9a8595; line-height: 1.6; word-break: break-all; }
+  .result-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .model-tag { display: inline-block; font-size: 12px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--pink-deep), var(--lavender-deep)); padding: 4px 10px; border-radius: 999px; }
+
+  /* loading */
+  .loading { display: none; text-align: center; padding: 40px 0; }
+  .loading.show { display: block; }
+  .spinner {
+    width: 46px; height: 46px; margin: 0 auto 16px;
+    border-radius: 50%;
+    border: 5px solid #f3d3e0; border-top-color: var(--pink-deep);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { color: var(--ink-soft); font-size: 14px; }
+  .loading .warn { color: #c98a4b; font-size: 12px; margin-top: 8px; }
+
+  /* ---------- BYOP 折叠 ---------- */
+  details.byop { background: var(--card-2); border-radius: 14px; padding: 14px 16px; margin-top: 14px; }
+  details.byop summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink); }
+  details.byop .body { margin-top: 12px; font-size: 13px; color: var(--ink-soft); line-height: 1.7; }
+  .byop-link { color: var(--lavender-deep); text-decoration: none; font-weight: 700; }
+  .byop-link:hover { text-decoration: underline; }
+
+  /* ---------- 页脚 ---------- */
+  footer { margin-top: 34px; text-align: center; color: #a490ab; font-size: 12px; line-height: 1.8; }
+  footer a { color: #cbb0e8; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px);
+    background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 999px;
+    font-size: 13px; box-shadow: var(--shadow); opacity: 0; transition: all .3s; z-index: 99;
+    max-width: 90vw; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="logo-row">
+      <div class="logo-badge">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2c1.8 2.6 1.8 5.4 0 8-1.8-2.6-1.8-5.4 0-8z" fill="#fff"/>
+          <path d="M6.5 6c1.2 1.7 1.2 3.6 0 5.3-1.2-1.7-1.2-3.6 0-5.3z" fill="#fff" opacity=".8"/>
+          <path d="M17.5 6c1.2 1.7 1.2 3.6 0 5.3-1.2-1.7-1.2-3.6 0-5.3z" fill="#fff" opacity=".8"/>
+          <rect x="4" y="13.5" width="16" height="3.2" rx="1.6" fill="#fff" opacity=".9"/>
+          <rect x="6.5" y="18" width="11" height="2.4" rx="1.2" fill="#fff" opacity=".7"/>
+        </svg>
+      </div>
+      <h1>Pollen 生图工坊</h1>
+    </div>
+    <div class="sub">基于 Pollinations AI · 官方 BYOP 规则 · 用自己的 Pollen 额度生成图片</div>
+  </header>
+
+  <div class="grid">
+
+    <!-- ============ 左：配置 ============ -->
+    <div>
+      <!-- 连接 -->
+      <div class="card">
+        <h2><span class="dot dot-pink"></span>一、连接账户</h2>
+        <label for="apiKey">API Key（sk_ 开头）</label>
+        <div class="key-row">
+          <input type="password" id="apiKey" placeholder="粘贴你的 sk_ 密钥，仅保存在本机浏览器" autocomplete="off">
+          <button class="btn btn-soft btn-sm" id="toggleKey" type="button">显示</button>
+        </div>
+        <div class="status-bar">
+          <span class="status-dot st-idle" id="keyDot"></span>
+          <span class="st-text" id="keyStatus">未连接。密钥仅存于本机浏览器（localStorage）。</span>
+        </div>
+        <div class="hint">没有 Key？到 <a class="byop-link" href="https://enter.pollinations.ai/keys" target="_blank" rel="noopener">enter.pollinations.ai/keys</a> 创建。生产环境请勿在前端使用 sk_ 密钥，应改用下方 BYOP 授权流程。</div>
+        <details class="byop">
+          <summary>使用 BYOP 授权（OAuth Code Flow + PKCE，官方推荐）</summary>
+          <div class="body">
+            先在 <a class="byop-link" href="https://enter.pollinations.ai/keys" target="_blank" rel="noopener">enter.pollinations.ai/keys</a> 创建
+            <b>App Key（pk_ 开头）</b>，并添加本页地址为 Redirect URI。然后填入下方并点击授权，用户将跳转到 Pollinations
+            同意页，用自己的 Pollen 额度为你的应用买单，返回的是受限的 scoped 密钥（不暴露主密钥）。
+          </div>
+          <label for="pkKey">App Key（pk_ 开头）</label>
+          <input type="text" id="pkKey" placeholder="pk_..." autocomplete="off">
+          <label for="pkScope">授权范围 scope（可留空，默认 usage）</label>
+          <input type="text" id="pkScope" placeholder="usage">
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn btn-ghost" id="startOAuth" type="button">开始授权</button>
+            <button class="btn btn-ghost" id="useScoped" type="button" style="display:none;">使用授权密钥</button>
+          </div>
+          <div class="hint" id="oauthHint"></div>
+        </details>
+      </div>
+
+      <!-- 创作 -->
+      <div class="card">
+        <h2><span class="dot dot-mint"></span>二、写下你的画面</h2>
+        <label for="prompt">提示词（英文效果更佳，支持中文）</label>
+        <textarea id="prompt" placeholder="例如：a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere"></textarea>
+        <div class="ex-row">
+          <span class="ex-chip" data-p="a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere">可爱猫猫</span>
+          <span class="ex-chip" data-p="a cozy pastel cottage in a flower meadow, morning light, anime style">花田小屋</span>
+          <span class="ex-chip" data-p="a delicious strawberry macaron dessert, soft studio lighting, food photography">草莓马卡龙</span>
+          <span class="ex-chip" data-p="a cute kawaii robot holding a flower, pastel colors, chibi style">治愈小机器人</span>
+          <span class="ex-chip" data-p="sakura trees along a riverside path at dusk, soft pink sky, illustration">樱花河畔</span>
+        </div>
+
+        <label>模型（价格约为每张图的花费）</label>
+        <div class="model-grid" id="modelGrid"></div>
+
+        <label>尺寸</label>
+        <div class="size-row" id="sizeRow"></div>
+        <div class="hint">模型支持 256x256 ~ 2048x2048，超大尺寸可能被模型限制或耗时更长。</div>
+
+        <button class="btn btn-primary btn-block" id="genBtn" type="button">生成图片</button>
+      </div>
+    </div>
+
+    <!-- ============ 右：结果 ============ -->
+    <div class="card result-area">
+      <h2><span class="dot dot-lav"></span>生成结果</h2>
+      <div id="resultBox"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    参照 <a href="https://github.com/pollinations/pollinations/blob/main/BRING_YOUR_OWN_POLLEN.md" target="_blank" rel="noopener">Pollinations BYOP 官方规则</a>
+    与 <a href="https://github.com/pollinations/pollinations/blob/main/APIDOCS.md" target="_blank" rel="noopener">APIDOCS</a> 构建 · 接口 POST https://gen.pollinations.ai/v1/images/generations
+    <br>图片由 AI 生成，请注意内容合规。如遇 429/503，请稍后重试。
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var API_BASE = 'https://gen.pollinations.ai';
+  var AUTH_BASE = 'https://enter.pollinations.ai';
+  var KEY_STORE = 'pollen_image_api_key';
+  var SCOPED_STORE = 'pollen_image_scoped_key';
+
+  // ---------------- 模型与尺寸数据 ----------------
+  var MODELS = [
+    { id: 'flux',       name: 'flux',       price: 0.002,  desc: '通用绘图，效果均衡，推荐入门' },
+    { id: 'zimage',     name: 'zimage',     price: 0.004,  desc: '高质量写实 / 艺术插画' },
+    { id: 'dreamshaper',name: 'dreamshaper',price: 0.0001, desc: '最省额度，动漫风格出图快' },
+    { id: 'gptimage',   name: 'gptimage',   price: 0.000006, desc: 'OpenAI 系画质，支持透明背景' },
+    { id: 'klein',      name: 'klein',      price: 0.005,  desc: '支持参考图编辑' },
+    { id: 'kontext',    name: 'kontext',    price: 0.04,   desc: '长上下文，适合复杂场景' },
+    { id: 'nova-canvas',name: 'nova-canvas',price: 0.04,   desc: '创意画布，风格鲜明' },
+    { id: 'custom',     name: '自定义模型',  price: null,   desc: '输入 /v1/models 中的其他模型 ID' }
+  ];
+  var SIZES = ['512x512', '768x768', '1024x1024', '768x1024', '1024x768', '512x768', '768x512', '1536x1024'];
+
+  var state = {
+    model: 'flux',
+    size: '1024x1024',
+    customModel: '',
+    generating: false
+  };
+
+  // ---------------- DOM 引用 ----------------
+  var $ = function (id) { return document.getElementById(id); };
+  var apiKeyEl = $('apiKey'), pkKeyEl = $('pkKey'), pkScopeEl = $('pkScope');
+  var promptEl = $('prompt'), genBtn = $('genBtn'), resultBox = $('resultBox');
+  var keyDot = $('keyDot'), keyStatus = $('keyStatus'), toastEl = $('toast');
+  var startOAuthBtn = $('startOAuth'), useScopedBtn = $('useScoped'), oauthHint = $('oauthHint');
+
+  // ---------------- 初始化 ----------------
+  function init() {
+    var saved = localStorage.getItem(KEY_STORE);
+    if (saved) { apiKeyEl.value = saved; setKeyState(true); }
+    var scoped = sessionStorage.getItem(SCOPED_STORE);
+    if (scoped) { useScopedBtn.style.display = ''; oauthHint.textContent = '检测到已授权密钥，可直接生成。'; }
+
+    buildModelGrid();
+    buildSizeRow();
+
+    genBtn.addEventListener('click', onGenerate);
+    $('toggleKey').addEventListener('click', function () {
+      apiKeyEl.type = apiKeyEl.type === 'password' ? 'text' : 'password';
+      this.textContent = apiKeyEl.type === 'password' ? '显示' : '隐藏';
+    });
+    apiKeyEl.addEventListener('change', saveKey);
+    apiKeyEl.addEventListener('input', function () { setKeyState(false); });
+    startOAuthBtn.addEventListener('click', startOAuth);
+    useScopedBtn.addEventListener('click', useScopedKey);
+
+    document.querySelectorAll('.ex-chip').forEach(function (el) {
+      el.addEventListener('click', function () {
+        promptEl.value = el.getAttribute('data-p');
+        promptEl.focus();
+      });
+    });
+
+    handleOAuthCallback();
+  }
+
+  // ---------------- 模型 / 尺寸 UI ----------------
+  function buildModelGrid() {
+    var grid = $('modelGrid');
+    MODELS.forEach(function (m) {
+      var label = document.createElement('label');
+      label.className = 'model-item' + (m.id === state.model ? ' selected' : '');
+      label.dataset.id = m.id;
+      var priceHtml = m.price !== null
+        ? '<span class="m-price">约 ' + m.price + ' pollen</span>'
+        : '<span class="m-price" style="background:#e7e0f5;color:#7c63c9;">按模型定价</span>';
+      label.innerHTML =
+        '<input type="radio" name="model" value="' + m.id + '"' + (m.id === state.model ? ' checked' : '') + '>' +
+        '<div class="m-name"><span>' + m.name + '</span>' + priceHtml + '</div>' +
+        '<div class="m-desc">' + m.desc + '</div>';
+      label.addEventListener('click', function () {
+        document.querySelectorAll('.model-item').forEach(function (x) { x.classList.remove('selected'); });
+        label.classList.add('selected');
+        state.model = m.id;
+        var customWrap = $('customModelWrap');
+        if (m.id === 'custom') {
+          if (!customWrap) {
+            var wrap = document.createElement('div');
+            wrap.id = 'customModelWrap';
+            wrap.innerHTML = '<label for="customModel">模型 ID</label><input type="text" id="customModel" placeholder="例如 rodrigookk/z-image-turbo">';
+            grid.appendChild(wrap);
+            $('customModel').addEventListener('input', function () { state.customModel = this.value.trim(); });
+          }
+        } else if (customWrap) {
+          customWrap.remove();
+        }
+      });
+      grid.appendChild(label);
+    });
+  }
+
+  function buildSizeRow() {
+    var row = $('sizeRow');
+    SIZES.forEach(function (s) {
+      var chip = document.createElement('span');
+      chip.className = 'size-chip' + (s === state.size ? ' selected' : '');
+      chip.textContent = s;
+      chip.addEventListener('click', function () {
+        document.querySelectorAll('.size-chip').forEach(function (x) { x.classList.remove('selected'); });
+        chip.classList.add('selected');
+        state.size = s;
+      });
+      row.appendChild(chip);
+    });
+  }
+
+  // ---------------- Key 管理 ----------------
+  function getKey() {
+    return apiKeyEl.value.trim();
+  }
+  function saveKey() {
+    var k = getKey();
+    if (k) { localStorage.setItem(KEY_STORE, k); setKeyState(true); }
+    else { localStorage.removeItem(KEY_STORE); setKeyState(false); }
+  }
+  function setKeyState(ok) {
+    keyDot.className = 'status-dot ' + (ok ? 'st-ok' : 'st-idle');
+    keyStatus.textContent = ok
+      ? '密钥已保存到本机浏览器，可开始生成。'
+      : '未连接。密钥仅存于本机浏览器（localStorage）。';
+  }
+  function useScopedKey() {
+    var k = sessionStorage.getItem(SCOPED_STORE);
+    if (k) {
+      apiKeyEl.value = k;
+      saveKey();
+      toast('已使用 BYOP 授权密钥');
+    }
+  }
+
+  // ---------------- 生成 ----------------
+  function currentModel() {
+    if (state.model === 'custom') {
+      return state.customModel || '';
+    }
+    return state.model;
+  }
+
+  function onGenerate() {
+    if (state.generating) return;
+    var key = getKey();
+    var prompt = promptEl.value.trim();
+    var model = currentModel();
+
+    if (!key) { toast('请先填写 API Key'); return; }
+    if (!prompt) { toast('请先填写提示词'); return; }
+    if (!model) { toast('请填写自定义模型 ID'); return; }
+
+    state.generating = true;
+    genBtn.disabled = true;
+    genBtn.textContent = '生成中，请稍候…';
+
+    renderLoading();
+    fetch(API_BASE + '/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + key,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        model: model,
+        size: state.size,
+        n: 1,
+        response_format: 'b64_json'
+      })
+    })
+    .then(function (res) {
+      if (!res.ok) {
+        return res.json().catch(function () { return {}; }).then(function (err) {
+          var detail = err && err.error && err.error.message ? err.error.message : ('HTTP ' + res.status);
+          throw new Error(detail);
+        });
+      }
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data || !data.data || !data.data[0]) throw new Error('响应中没有图片数据');
+      var item = data.data[0];
+      if (item.b64_json) {
+        renderResult(item, model, prompt);
+      } else if (item.url) {
+        renderResultFromUrl(item.url, model, prompt);
+      } else {
+        throw new Error('响应格式异常');
+      }
+    })
+    .catch(function (err) {
+      renderError(err.message || '生成失败，请重试');
+    })
+    .finally(function () {
+      state.generating = false;
+      genBtn.disabled = false;
+      genBtn.textContent = '生成图片';
+    });
+  }
+
+  function mimeFromB64(b64) {
+    if (b64.indexOf('iVBOR') === 0) return 'image/png';
+    if (b64.indexOf('/9j/') === 0) return 'image/jpeg';
+    if (b64.indexOf('PHN2Zy') === 0) return 'image/svg+xml';
+    if (b64.indexOf('UklGR') === 0) return 'image/webp';
+    return 'image/png';
+  }
+
+  function renderResult(item, model, prompt) {
+    var b64 = item.b64_json;
+    var mime = mimeFromB64(b64);
+    var dataUrl = 'data:' + mime + ';base64,' + b64;
+    var now = new Date();
+    var stamp = now.getFullYear() + '-' +
+      String(now.getMonth() + 1).padStart(2, '0') + '-' +
+      String(now.getDate()).padStart(2, '0') + '_' +
+      String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0') + String(now.getSeconds()).padStart(2, '0');
+    var ext = mime.indexOf('png') >= 0 ? 'png' : (mime.indexOf('svg') >= 0 ? 'svg' : (mime.indexOf('webp') >= 0 ? 'webp' : 'jpg'));
+
+    resultBox.innerHTML =
+      '<div class="img-box"><img src="' + dataUrl + '" alt="生成结果"></div>' +
+      '<div class="result-actions">' +
+        '<span class="model-tag">' + escapeHtml(model) + '</span>' +
+        '<button class="btn btn-primary btn-sm" id="dlBtn">下载图片</button>' +
+        '<button class="btn btn-soft btn-sm" id="regenBtn">换一张</button>' +
+      '</div>' +
+      '<div class="img-meta">尺寸 ' + state.size + ' · ' + ext.toUpperCase() + ' · 生成于 ' + now.toLocaleTimeString() + '<br>提示词：' + escapeHtml(prompt) + '</div>';
+
+    $('dlBtn').addEventListener('click', function () {
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'pollen_' + state.size + '_' + model.replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + stamp + '.' + ext;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
+    $('regenBtn').addEventListener('click', onGenerate);
+    if (item.revised_prompt && item.revised_prompt !== prompt) {
+      var meta = resultBox.querySelector('.img-meta');
+      if (meta) meta.insertAdjacentHTML('beforeend', '<br>模型修订提示词：' + escapeHtml(item.revised_prompt));
+    }
+  }
+
+  function renderResultFromUrl(url, model, prompt) {
+    var key = getKey();
+    fetch(url, { headers: { 'Authorization': 'Bearer ' + key } })
+      .then(function (res) {
+        if (!res.ok) throw new Error('图片下载失败 HTTP ' + res.status);
+        return res.blob();
+      })
+      .then(function (blob) {
+        var fr = new FileReader();
+        fr.onload = function () {
+          renderResult({ b64_json: fr.result.split(',')[1] }, model, prompt);
+        };
+        fr.readAsDataURL(blob);
+      })
+      .catch(function (err) {
+        renderError(err.message);
+      });
+  }
+
+  function renderLoading() {
+    resultBox.innerHTML =
+      '<div class="loading show">' +
+        '<div class="spinner"></div>' +
+        '<p>正在创作你的画面，请稍候…</p>' +
+        '<p class="warn">生成通常需要 10~60 秒，请勿关闭页面</p>' +
+      '</div>';
+  }
+
+  function renderError(msg) {
+    resultBox.innerHTML =
+      '<div class="placeholder">' +
+        '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">' +
+          '<circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="16.5" r=".8" fill="currentColor"/>' +
+        '</svg>' +
+        '<div>生成失败：' + escapeHtml(msg) + '</div>' +
+        '<div style="font-size:12px">请检查 Key 是否正确、额度是否充足，或稍后重试（429/503 时等待 Retry-After）</div>' +
+      '</div>';
+  }
+
+  // ---------------- BYOP OAuth (PKCE) ----------------
+  function base64url(str) {
+    var bytes = new TextEncoder().encode(str);
+    var bin = '';
+    bytes.forEach(function (b) { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function sha256(str) {
+    var bytes = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', bytes).then(function (buf) {
+      var bin = '';
+      new Uint8Array(buf).forEach(function (b) { bin += String.fromCharCode(b); });
+      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    });
+  }
+
+  function startOAuth() {
+    var pk = pkKeyEl.value.trim();
+    if (!pk) { toast('请先填写 App Key（pk_ 开头）'); return; }
+    if (!window.crypto || !crypto.subtle) { toast('当前浏览器不支持 PKCE，请使用现代浏览器'); return; }
+
+    var redirectUri = location.href.split('#')[0];
+    var verifier = '';
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    for (var i = 0; i < 64; i++) verifier += chars.charAt(Math.floor(Math.random() * chars.length));
+
+    var scope = (pkScopeEl.value.trim() || 'usage').replace(/\s+/g, ' ');
+    var state = base64url(Math.random().toString(36).slice(2));
+
+    sessionStorage.setItem('pkce_verifier', verifier);
+    sessionStorage.setItem('pkce_state', state);
+
+    sha256(verifier).then(function (challenge) {
+      var params = new URLSearchParams({
+        response_type: 'code',
+        client_id: pk,
+        redirect_uri: redirectUri,
+        scope: scope,
+        state: state,
+        code_challenge: challenge,
+        code_challenge_method: 'S256'
+      });
+      window.location.href = AUTH_BASE + '/authorize?' + params.toString();
+    });
+  }
+
+  function handleOAuthCallback() {
+    var q = new URLSearchParams(location.search);
+    var code = q.get('code');
+    var state = q.get('state');
+    var error = q.get('error');
+    if (error) { toast('授权失败：' + error); history.replaceState({}, '', location.pathname); return; }
+    if (!code) return;
+
+    var verifier = sessionStorage.getItem('pkce_verifier');
+    var savedState = sessionStorage.getItem('pkce_state');
+    if (!verifier || (savedState && savedState !== state)) {
+      toast('授权校验失败（state 不匹配或 verifier 丢失）');
+      history.replaceState({}, '', location.pathname);
+      return;
+    }
+
+    var pk = pkKeyEl.value.trim();
+    var redirectUri = location.href.split('#')[0];
+
+    fetch(AUTH_BASE + '/api/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        client_id: pk,
+        redirect_uri: redirectUri,
+        code_verifier: verifier
+      })
+    })
+    .then(function (res) {
+      if (!res.ok) throw new Error('换取密钥失败 HTTP ' + res.status);
+      return res.json();
+    })
+    .then(function (data) {
+      if (!data.access_token) throw new Error('响应中没有 access_token');
+      sessionStorage.setItem(SCOPED_STORE, data.access_token);
+      sessionStorage.removeItem('pkce_verifier');
+      sessionStorage.removeItem('pkce_state');
+      history.replaceState({}, '', location.pathname);
+      toast('授权成功，密钥已就绪（仅本次会话有效）');
+      useScopedBtn.style.display = '';
+      oauthHint.textContent = '已获取 scoped 密钥，点击"使用授权密钥"即可开始生成。';
+    })
+    .catch(function (err) {
+      toast('授权失败：' + err.message);
+      history.replaceState({}, '', location.pathname);
+    });
+  }
+
+  // ---------------- 工具 ----------------
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  var toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 3200);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
