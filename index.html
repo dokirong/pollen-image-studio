@@ -27,14 +27,21 @@
   body {
     font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
     background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
     color: var(--ink);
-    padding: 28px 18px 60px;
+    padding: 16px 24px;
   }
-  .wrap { max-width: 1080px; margin: 0 auto; }
+  .wrap {
+    max-width: min(1680px, 94vw);
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
   /* ---------- 顶部栏（LOGO 左 / 登录框 右） ---------- */
-  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; flex: 0 0 auto; }
   .logo-row { display: flex; align-items: center; gap: 12px; }
   .logo-badge {
     width: 52px; height: 52px; border-radius: 16px;
@@ -56,8 +63,19 @@
   }
 
   /* ---------- 布局（左右 1:3） ---------- */
-  .grid { display: grid; grid-template-columns: 1fr 3fr; gap: 22px; align-items: start; }
-  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+  .grid { display: grid; grid-template-columns: 1fr 3fr; gap: 22px; align-items: stretch; flex: 1 1 auto; min-height: 0; }
+  /* 两栏各自在列内滚动，整个页面保持 100vh 不滚动 */
+  .grid > div:first-child { min-height: 0; overflow-y: auto; padding-right: 6px; }
+  .grid > div:first-child .card { margin-bottom: 0; }
+  .result-area { min-height: 0; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; }
+  .result-area > h2 { flex: 0 0 auto; }
+  #resultBox { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  @media (max-width: 880px) {
+    .grid { grid-template-columns: 1fr; }
+    body { height: auto; overflow: auto; }
+    .wrap { height: auto; }
+    .grid > div:first-child, .result-area { overflow: visible; max-height: none; }
+  }
 
   .card {
     background: var(--card);
@@ -89,7 +107,7 @@
     font-family: inherit;
   }
   input:focus, select:focus, textarea:focus { border-color: var(--pink); }
-  textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+  textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
   .hint { font-size: 12px; color: #9a8595; margin-top: 6px; line-height: 1.5; }
 
   .key-row { display: flex; gap: 8px; align-items: center; }
@@ -182,17 +200,17 @@
   .st-text { font-size: 12px; color: var(--ink-soft); }
 
   /* ---------- 结果 ---------- */
-  .result-area { min-height: 300px; }
+  /* 结果区高度见 .grid 段（由栅格约束，不单独设 min-height） */
   .placeholder {
     border: 2px dashed #e8d8e2; border-radius: 14px;
-    min-height: 260px; display: flex; flex-direction: column;
+    min-height: 260px; flex: 1 1 auto; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 12px;
     color: #b49fa9; font-size: 14px; background: var(--card-2);
     text-align: center; padding: 20px;
   }
   .placeholder svg { opacity: .55; }
   .img-box { position: relative; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
-  .img-box img { width: 100%; display: block; }
+  .img-box img { max-width: 100%; max-height: calc(100vh - 230px); display: block; margin: 0 auto; border-radius: 14px; }
   .img-meta { margin-top: 10px; font-size: 12px; color: #9a8595; line-height: 1.6; word-break: break-all; }
   .result-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
   .model-tag { display: inline-block; font-size: 12px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--pink-deep), var(--lavender-deep)); padding: 4px 10px; border-radius: 999px; }
