@@ -495,8 +495,7 @@
   // 固定的回调地址（与 App Key 登记的 Redirect URI 完全一致，写死避免本地/线上计算不一致）
   var REDIRECT_URI = 'https://image.lanprint.com/';
 
-  // ---------------- 界面语言切换（顶部按钮，中/英） ----------------
-  var LANG_STORE = 'pollen_lang';
+  // ---------------- 界面语言切换（顶部按钮，IP 主导，会话内手动切换） ----------------
   var I18N = {
     zh: {
       labelPrompt: '提示词', btnLang: '中文', btnGen: '生成图片', btnGenBusy: '生成中，请稍候…', btnTrans: '智能转换中…',
@@ -545,13 +544,8 @@
       oauthOk: 'Connected. Generation uses your authorized scoped key (valid for this session).'
     }
   };
-  // 默认语言：用户手动选过则记住；否则按访问者 IP 所属地区（中国=zh，其他=en）
-  var uiLang = localStorage.getItem(LANG_STORE) === 'en' ? 'en' : localStorage.getItem(LANG_STORE) === 'zh' ? 'zh' : (function () {
-    try {
-      // 未手动选过：先默认中文，随后由 IP 检测决定（见 init 的 detectCountry 逻辑）
-      return 'zh';
-    } catch (e) { return 'zh'; }
-  })();
+  // 语言：IP 主导（中国=zh，其他=en），加载时先按 zh 渲染、随后由 IP 检测校正；手动切换仅当前会话生效
+  var uiLang = 'zh';
   function t(key) { return (I18N[uiLang] && I18N[uiLang][key]) || key; }
   function applyLang() {
     var L = I18N[uiLang];
@@ -615,21 +609,18 @@
       promptEl.focus();
     });
 
-    // 语言切换
+    // 语言切换（仅当前会话生效，刷新后重新按 IP 决定）
     $('langBtn').addEventListener('click', function () {
       uiLang = uiLang === 'zh' ? 'en' : 'zh';
-      localStorage.setItem(LANG_STORE, uiLang);
       applyLang();
     });
 
-    // 首次访问（未手动选过语言）：按访问者 IP 决定默认界面语言
-    if (!localStorage.getItem(LANG_STORE)) {
-      detectCountry().then(function (country) {
-        var cn = /China|中国/.test(country || '');
-        uiLang = cn ? 'zh' : 'en';
-        applyLang();  // 重新应用语言（含模型/尺寸/参考卡重建）
-      });
-    }
+    // IP 主导：每次访问都按访问者 IP 决定界面语言（中国=中文，其他=英文）
+    detectCountry().then(function (country) {
+      var cn = /China|中国/.test(country || '');
+      uiLang = cn ? 'zh' : 'en';
+      applyLang();  // 重新应用语言（含模型/尺寸/参考卡重建）
+    });
     applyLang();
 
     // 未连接且不是 OAuth 回调页 -> 载入即弹出登录模态框
