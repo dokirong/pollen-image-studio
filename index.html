@@ -544,8 +544,8 @@
       oauthOk: 'Connected. Generation uses your authorized scoped key (valid for this session).'
     }
   };
-  // 语言：IP 主导（中国=zh，其他=en），加载时先按 zh 渲染、随后由 IP 检测校正；手动切换仅当前会话生效
-  var uiLang = 'zh';
+  // 语言：同步判定浏览器语言（非中文 -> 英文），IP 检测仅作二次兜底；手动切换仅当前会话生效
+  var uiLang = (function () { var l = (navigator.language || '').toLowerCase(); return (/^zh/.test(l) ? 'zh' : 'en'); })();
   function t(key) { return (I18N[uiLang] && I18N[uiLang][key]) || key; }
   function applyLang() {
     var L = I18N[uiLang];
@@ -609,17 +609,21 @@
       promptEl.focus();
     });
 
-    // 语言切换（仅当前会话生效，刷新后重新按 IP 决定）
+    // 语言切换（仅当前会话生效；随后 IP 兜底不覆盖手动切换）
+    var userToggled = false;
     $('langBtn').addEventListener('click', function () {
       uiLang = uiLang === 'zh' ? 'en' : 'zh';
+      userToggled = true;
+      localStorage.setItem('pollen_lang_sess', uiLang);  // 会话内记住，避免 IP 覆盖
       applyLang();
     });
 
-    // IP 主导：每次访问都按访问者 IP 决定界面语言（中国=中文，其他=英文）
+    // IP 兜底校正：仅当用户未手动切换时，才按 IP 修正默认语言
     detectCountry().then(function (country) {
+      if (userToggled) return;
       var cn = /China|中国/.test(country || '');
-      uiLang = cn ? 'zh' : 'en';
-      applyLang();  // 重新应用语言（含模型/尺寸/参考卡重建）
+      var desired = cn ? 'zh' : 'en';
+      if (desired !== uiLang) { uiLang = desired; applyLang(); }
     });
     applyLang();
 
