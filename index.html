@@ -74,7 +74,7 @@
   .dot-lav { background: var(--lavender-deep); }
 
   label { font-size: 13px; color: var(--ink-soft); display: block; margin: 12px 0 6px; font-weight: 600; }
-  input[type="text"], input[type="password"], select, textarea {
+  input[type="text"], input[type="password"], input[type="number"], select, textarea {
     width: 100%; padding: 11px 13px;
     border: 2px solid #eee0ea; border-radius: 12px;
     font-size: 14px; color: var(--ink);
@@ -106,8 +106,31 @@
   .btn-soft:hover { background: #fbe3ed; }
   .btn-ghost { background: transparent; color: var(--lavender-deep); border: 2px dashed var(--lavender); padding: 8px 12px; font-size: 13px; }
   .btn-ghost:hover { border-color: var(--lavender-deep); }
-  .btn-block { width: 100%; margin-top: 18px; padding: 14px; font-size: 16px; letter-spacing: 2px; }
+  .btn-block { width: 100%; margin-top: 16px; padding: 14px; font-size: 16px; letter-spacing: 2px; }
   .btn-sm { padding: 8px 14px; font-size: 13px; }
+
+  /* ---------- BYOP 主连接区 ---------- */
+  .byop-primary {
+    background: linear-gradient(135deg, #fff4f8 0%, #f3ecff 100%);
+    border: 2px solid #f0d6e6;
+    border-radius: 14px; padding: 16px;
+  }
+  .byop-title { font-size: 15px; font-weight: 800; color: var(--pink-deep); }
+  .byop-desc { font-size: 12px; color: var(--ink-soft); line-height: 1.6; margin: 6px 0 4px; }
+  .opt-row { display: flex; gap: 12px; }
+  .opt-row > div { flex: 1; }
+  .opt-row input[type="number"] { width: 100%; }
+
+  .connected {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--white); border: 2px solid var(--mint);
+    border-radius: 14px;
+  }
+  .connected img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
+  .connected .conn-name { font-size: 14px; font-weight: 800; color: var(--ink); }
+  .connected .conn-sub { font-size: 12px; color: var(--mint-deep); }
+  .connected .btn { margin-left: auto; }
 
   /* ---------- 模型卡片 ---------- */
   .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -183,10 +206,10 @@
   .loading p { color: var(--ink-soft); font-size: 14px; }
   .loading .warn { color: #c98a4b; font-size: 12px; margin-top: 8px; }
 
-  /* ---------- BYOP 折叠 ---------- */
+  /* ---------- 折叠（备用） ---------- */
   details.byop { background: var(--card-2); border-radius: 14px; padding: 14px 16px; margin-top: 14px; }
   details.byop summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink); }
-  details.byop .body { margin-top: 12px; font-size: 13px; color: var(--ink-soft); line-height: 1.7; }
+  details.byop .body { margin-top: 12px; }
   .byop-link { color: var(--lavender-deep); text-decoration: none; font-weight: 700; }
   .byop-link:hover { text-decoration: underline; }
 
@@ -221,7 +244,7 @@
       </div>
       <h1>Pollen 生图工坊</h1>
     </div>
-    <div class="sub">基于 Pollinations AI · 官方 BYOP 规则 · 用自己的 Pollen 额度生成图片</div>
+    <div class="sub">基于 Pollinations AI 官方 BYOP 授权流程 · 用你自己的 Pollen 额度生成图片</div>
   </header>
 
   <div class="grid">
@@ -230,33 +253,61 @@
     <div>
       <!-- 连接 -->
       <div class="card">
-        <h2><span class="dot dot-pink"></span>一、连接账户</h2>
-        <label for="apiKey">API Key（sk_ 开头）</label>
-        <div class="key-row">
-          <input type="password" id="apiKey" placeholder="粘贴你的 sk_ 密钥，仅保存在本机浏览器" autocomplete="off">
-          <button class="btn btn-soft btn-sm" id="toggleKey" type="button">显示</button>
-        </div>
-        <div class="status-bar">
-          <span class="status-dot st-idle" id="keyDot"></span>
-          <span class="st-text" id="keyStatus">未连接。密钥仅存于本机浏览器（localStorage）。</span>
-        </div>
-        <div class="hint">没有 Key？到 <a class="byop-link" href="https://enter.pollinations.ai/keys" target="_blank" rel="noopener">enter.pollinations.ai/keys</a> 创建。生产环境请勿在前端使用 sk_ 密钥，应改用下方 BYOP 授权流程。</div>
-        <details class="byop">
-          <summary>使用 BYOP 授权（OAuth Code Flow + PKCE，官方推荐）</summary>
-          <div class="body">
-            先在 <a class="byop-link" href="https://enter.pollinations.ai/keys" target="_blank" rel="noopener">enter.pollinations.ai/keys</a> 创建
-            <b>App Key（pk_ 开头）</b>，并添加本页地址为 Redirect URI。然后填入下方并点击授权，用户将跳转到 Pollinations
-            同意页，用自己的 Pollen 额度为你的应用买单，返回的是受限的 scoped 密钥（不暴露主密钥）。
+        <h2><span class="dot dot-pink"></span>一、连接你的 Pollen 账户</h2>
+
+        <div class="byop-primary">
+          <div class="byop-title">官方 BYOP 授权登录（推荐）</div>
+          <p class="byop-desc">用你自己的 Pollen 额度生成图片。密钥只存在本次会话（sessionStorage），不落盘、不进前端代码，可随时在 Pollinations 后台撤销。</p>
+
+          <label>第 1 步：把下面这个回调地址，加到你 App Key 的 Redirect URI</label>
+          <div class="key-row">
+            <input type="text" id="redirectUri" readonly>
+            <button class="btn btn-soft btn-sm" id="copyUri" type="button">复制</button>
           </div>
-          <label for="pkKey">App Key（pk_ 开头）</label>
+          <div class="hint">打开 <a class="byop-link" href="https://enter.pollinations.ai/keys" target="_blank" rel="noopener">enter.pollinations.ai/keys</a> 创建 App Key（pk_ 开头），把上面这串原样填进「Redirect URI」并保存。</div>
+
+          <label for="pkKey">第 2 步：粘贴你的 App Key（pk_ 开头）</label>
           <input type="text" id="pkKey" placeholder="pk_..." autocomplete="off">
-          <label for="pkScope">授权范围 scope（可留空，默认 usage）</label>
-          <input type="text" id="pkScope" placeholder="usage">
-          <div style="display:flex;gap:8px;margin-top:12px;">
-            <button class="btn btn-ghost" id="startOAuth" type="button">开始授权</button>
-            <button class="btn btn-ghost" id="useScoped" type="button" style="display:none;">使用授权密钥</button>
+
+          <div class="opt-row">
+            <div>
+              <label for="pkExpiry">密钥有效期（天）</label>
+              <input type="number" id="pkExpiry" value="7" min="1" max="365">
+            </div>
+            <div>
+              <label for="pkBudget">额度上限（留空=由你后台设）</label>
+              <input type="text" id="pkBudget" placeholder="如 10">
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-block" id="startOAuth" type="button">授权并连接</button>
+
+          <!-- 已连接状态 -->
+          <div class="connected" id="connectedBox" style="display:none;">
+            <img id="connAvatar" alt="">
+            <div>
+              <div class="conn-name" id="connName"></div>
+              <div class="conn-sub" id="connSub"></div>
+            </div>
+            <button class="btn btn-soft btn-sm" id="disconnectBtn" type="button">退出连接</button>
           </div>
           <div class="hint" id="oauthHint"></div>
+        </div>
+
+        <details class="byop">
+          <summary>或：直接粘贴 sk_ 密钥（仅开发 / 自用，非官方推荐）</summary>
+          <div class="body">
+            <label for="apiKey">API Key（sk_ 开头）</label>
+            <div class="key-row">
+              <input type="password" id="apiKey" placeholder="粘贴 sk_ 密钥，仅存本机浏览器" autocomplete="off">
+              <button class="btn btn-soft btn-sm" id="toggleKey" type="button">显示</button>
+            </div>
+            <div class="status-bar">
+              <span class="status-dot st-idle" id="keyDot"></span>
+              <span class="st-text" id="keyStatus">未填写。</span>
+            </div>
+            <div class="hint">前端直接放 sk_ 主密钥不安全，生产环境请改用上面的官方 BYOP 授权。</div>
+          </div>
         </details>
       </div>
 
@@ -294,7 +345,7 @@
 
   <footer>
     参照 <a href="https://github.com/pollinations/pollinations/blob/main/BRING_YOUR_OWN_POLLEN.md" target="_blank" rel="noopener">Pollinations BYOP 官方规则</a>
-    与 <a href="https://github.com/pollinations/pollinations/blob/main/APIDOCS.md" target="_blank" rel="noopener">APIDOCS</a> 构建 · 接口 POST https://gen.pollinations.ai/v1/images/generations
+    构建 · 接口 POST https://gen.pollinations.ai/v1/images/generations
     <br>图片由 AI 生成，请注意内容合规。如遇 429/503，请稍后重试。
   </footer>
 </div>
@@ -307,8 +358,16 @@
 
   var API_BASE = 'https://gen.pollinations.ai';
   var AUTH_BASE = 'https://enter.pollinations.ai';
+
+  // 存密钥的位置：
+  //  - 官方 BYOP 授权拿到的限权 sk_  -> sessionStorage（按官方要求，绝不进 localStorage / URL）
+  //  - 备用的 sk_ 主密钥（仅开发）   -> localStorage
+  var SCOPED_STORE = 'pollen_scoped_key';
+  var USERINFO_STORE = 'pollen_userinfo';
+  var PKCE_VERIFIER = 'pollen_pkce_verifier';
+  var PKCE_STATE = 'pollen_pkce_state';
+  var PKCE_CLIENT = 'pollen_pkce_client';   // 记住 client_id(pk_) 用于回调换 token
   var KEY_STORE = 'pollen_image_api_key';
-  var SCOPED_STORE = 'pollen_image_scoped_key';
 
   // ---------------- 模型与尺寸数据 ----------------
   var MODELS = [
@@ -332,17 +391,28 @@
 
   // ---------------- DOM 引用 ----------------
   var $ = function (id) { return document.getElementById(id); };
-  var apiKeyEl = $('apiKey'), pkKeyEl = $('pkKey'), pkScopeEl = $('pkScope');
+  var apiKeyEl = $('apiKey');
+  var pkKeyEl = $('pkKey'), pkExpiryEl = $('pkExpiry'), pkBudgetEl = $('pkBudget');
   var promptEl = $('prompt'), genBtn = $('genBtn'), resultBox = $('resultBox');
   var keyDot = $('keyDot'), keyStatus = $('keyStatus'), toastEl = $('toast');
-  var startOAuthBtn = $('startOAuth'), useScopedBtn = $('useScoped'), oauthHint = $('oauthHint');
+  var startOAuthBtn = $('startOAuth'), redirectUriEl = $('redirectUri'), copyUriBtn = $('copyUri');
+  var connectedBox = $('connectedBox'), connAvatar = $('connAvatar'), connName = $('connName'), connSub = $('connSub');
+  var disconnectBtn = $('disconnectBtn'), oauthHint = $('oauthHint');
+
+  // 始终一致的回调地址：origin + pathname（不含 query/hash），必须和 App Key 里登记的完全一致
+  var REDIRECT_URI = location.origin + location.pathname;
 
   // ---------------- 初始化 ----------------
   function init() {
+    redirectUriEl.value = REDIRECT_URI;
+
+    var scoped = sessionStorage.getItem(SCOPED_STORE);
+    if (scoped) {
+      var ui = safeParse(sessionStorage.getItem(USERINFO_STORE));
+      showConnected(ui);
+    }
     var saved = localStorage.getItem(KEY_STORE);
     if (saved) { apiKeyEl.value = saved; setKeyState(true); }
-    var scoped = sessionStorage.getItem(SCOPED_STORE);
-    if (scoped) { useScopedBtn.style.display = ''; oauthHint.textContent = '检测到已授权密钥，可直接生成。'; }
 
     buildModelGrid();
     buildSizeRow();
@@ -355,7 +425,13 @@
     apiKeyEl.addEventListener('change', saveKey);
     apiKeyEl.addEventListener('input', function () { setKeyState(false); });
     startOAuthBtn.addEventListener('click', startOAuth);
-    useScopedBtn.addEventListener('click', useScopedKey);
+    copyUriBtn.addEventListener('click', function () {
+      redirectUriEl.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      if (navigator.clipboard) navigator.clipboard.writeText(REDIRECT_URI).catch(function(){});
+      toast('回调地址已复制');
+    });
+    disconnectBtn.addEventListener('click', disconnect);
 
     document.querySelectorAll('.ex-chip').forEach(function (el) {
       el.addEventListener('click', function () {
@@ -364,6 +440,7 @@
       });
     });
 
+    // 若是 OAuth 回调（带 ?code= 或 ?error=），在此处理
     handleOAuthCallback();
   }
 
@@ -419,33 +496,46 @@
 
   // ---------------- Key 管理 ----------------
   function getKey() {
-    return apiKeyEl.value.trim();
+    // 优先用官方授权拿到的限权密钥；没有则退回备用的 sk_
+    return sessionStorage.getItem(SCOPED_STORE) || apiKeyEl.value.trim();
   }
   function saveKey() {
-    var k = getKey();
+    var k = apiKeyEl.value.trim();
     if (k) { localStorage.setItem(KEY_STORE, k); setKeyState(true); }
     else { localStorage.removeItem(KEY_STORE); setKeyState(false); }
   }
   function setKeyState(ok) {
     keyDot.className = 'status-dot ' + (ok ? 'st-ok' : 'st-idle');
-    keyStatus.textContent = ok
-      ? '密钥已保存到本机浏览器，可开始生成。'
-      : '未连接。密钥仅存于本机浏览器（localStorage）。';
+    keyStatus.textContent = ok ? '密钥已保存到本机浏览器（备用路径）。' : '未填写。';
   }
-  function useScopedKey() {
-    var k = sessionStorage.getItem(SCOPED_STORE);
-    if (k) {
-      apiKeyEl.value = k;
-      saveKey();
-      toast('已使用 BYOP 授权密钥');
+
+  // 已连接状态展示
+  function showConnected(ui) {
+    connectedBox.style.display = '';
+    if (ui && ui.preferred_username) {
+      connName.textContent = '@' + ui.preferred_username;
+      connSub.textContent = '已通过官方 BYOP 授权连接';
+      if (ui.picture) connAvatar.src = ui.picture; else connAvatar.style.display = 'none';
+    } else {
+      connName.textContent = '已连接';
+      connSub.textContent = '限权密钥生效中（本次会话）';
+      connAvatar.style.display = 'none';
     }
+  }
+  function disconnect() {
+    sessionStorage.removeItem(SCOPED_STORE);
+    sessionStorage.removeItem(USERINFO_STORE);
+    sessionStorage.removeItem(PKCE_VERIFIER);
+    sessionStorage.removeItem(PKCE_STATE);
+    sessionStorage.removeItem(PKCE_CLIENT);
+    connectedBox.style.display = 'none';
+    oauthHint.textContent = '已退出连接。';
+    toast('已退出连接');
   }
 
   // ---------------- 生成 ----------------
   function currentModel() {
-    if (state.model === 'custom') {
-      return state.customModel || '';
-    }
+    if (state.model === 'custom') return state.customModel || '';
     return state.model;
   }
 
@@ -455,7 +545,7 @@
     var prompt = promptEl.value.trim();
     var model = currentModel();
 
-    if (!key) { toast('请先填写 API Key'); return; }
+    if (!key) { toast('请先连接账户（官方授权）或填写 sk_ 密钥'); return; }
     if (!prompt) { toast('请先填写提示词'); return; }
     if (!model) { toast('请填写自定义模型 ID'); return; }
 
@@ -586,107 +676,147 @@
           '<circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="16.5" r=".8" fill="currentColor"/>' +
         '</svg>' +
         '<div>生成失败：' + escapeHtml(msg) + '</div>' +
-        '<div style="font-size:12px">请检查 Key 是否正确、额度是否充足，或稍后重试（429/503 时等待 Retry-After）</div>' +
+        '<div style="font-size:12px">请检查密钥是否正确、额度是否充足，或稍后重试（429/503 时等待 Retry-After）</div>' +
       '</div>';
   }
 
-  // ---------------- BYOP OAuth (PKCE) ----------------
-  function base64url(str) {
-    var bytes = new TextEncoder().encode(str);
-    var bin = '';
-    bytes.forEach(function (b) { bin += String.fromCharCode(b); });
+  // ---------------- BYOP OAuth 2.0 授权码流程 + PKCE（官方规范） ----------------
+  function base64url(bufOrStr) {
+    var bin;
+    if (typeof bufOrStr === 'string') {
+      bin = ''; for (var i = 0; i < bufOrStr.length; i++) bin += String.fromCharCode(bufOrStr.charCodeAt(i));
+    } else {
+      bin = ''; new Uint8Array(bufOrStr).forEach(function (b) { bin += String.fromCharCode(b); });
+    }
     return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
   function sha256(str) {
     var bytes = new TextEncoder().encode(str);
-    return crypto.subtle.digest('SHA-256', bytes).then(function (buf) {
-      var bin = '';
-      new Uint8Array(buf).forEach(function (b) { bin += String.fromCharCode(b); });
-      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    });
+    return crypto.subtle.digest('SHA-256', bytes);
   }
 
   function startOAuth() {
     var pk = pkKeyEl.value.trim();
-    if (!pk) { toast('请先填写 App Key（pk_ 开头）'); return; }
+    if (!pk) { toast('请先粘贴 App Key（pk_ 开头）'); return; }
     if (!window.crypto || !crypto.subtle) { toast('当前浏览器不支持 PKCE，请使用现代浏览器'); return; }
 
-    var redirectUri = location.href.split('#')[0];
+    // 生成 PKCE verifier / challenge 与 state
     var verifier = '';
     var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-    for (var i = 0; i < 64; i++) verifier += chars.charAt(Math.floor(Math.random() * chars.length));
+    var buf = new Uint8Array(64);
+    crypto.getRandomValues(buf);
+    for (var i = 0; i < 64; i++) verifier += chars.charAt(buf[i] % chars.length);
+    var stateVal = base64url(String.fromCharCode.apply(null, crypto.getRandomValues(new Uint8Array(16))));
 
-    var scope = (pkScopeEl.value.trim() || 'usage').replace(/\s+/g, ' ');
-    var state = base64url(Math.random().toString(36).slice(2));
+    // 记住 client_id 与重定向地址，回调换 token 时必须一致
+    sessionStorage.setItem(PKCE_VERIFIER, verifier);
+    sessionStorage.setItem(PKCE_STATE, stateVal);
+    sessionStorage.setItem(PKCE_CLIENT, pk);
 
-    sessionStorage.setItem('pkce_verifier', verifier);
-    sessionStorage.setItem('pkce_state', state);
+    oauthHint.textContent = '正在跳转到 Pollinations 同意页，请用你的账户完成授权…';
 
-    sha256(verifier).then(function (challenge) {
-      var params = new URLSearchParams({
+    sha256(verifier).then(function (digest) {
+      var challenge = base64url(digest);
+      var p = new URLSearchParams({
         response_type: 'code',
         client_id: pk,
-        redirect_uri: redirectUri,
-        scope: scope,
-        state: state,
+        redirect_uri: REDIRECT_URI,
+        scope: 'profile usage',
+        state: stateVal,
         code_challenge: challenge,
         code_challenge_method: 'S256'
       });
-      window.location.href = AUTH_BASE + '/authorize?' + params.toString();
+      var expiry = parseInt(pkExpiryEl.value, 10);
+      if (expiry > 0) p.set('expiry', String(expiry));
+      var budget = pkBudgetEl.value.trim();
+      if (budget) p.set('budget', budget);
+      window.location.href = AUTH_BASE + '/authorize?' + p.toString();
+    }).catch(function () {
+      toast('生成 PKCE 参数失败，请重试');
     });
   }
 
   function handleOAuthCallback() {
     var q = new URLSearchParams(location.search);
     var code = q.get('code');
-    var state = q.get('state');
+    var stateParam = q.get('state');
     var error = q.get('error');
-    if (error) { toast('授权失败：' + error); history.replaceState({}, '', location.pathname); return; }
-    if (!code) return;
+    var errorDesc = q.get('error_description');
 
-    var verifier = sessionStorage.getItem('pkce_verifier');
-    var savedState = sessionStorage.getItem('pkce_state');
-    if (!verifier || (savedState && savedState !== state)) {
-      toast('授权校验失败（state 不匹配或 verifier 丢失）');
+    if (error) {
+      toast('授权被拒绝：' + (errorDesc || error));
+      history.replaceState({}, '', location.pathname);
+      return;
+    }
+    if (!code) return;  // 普通打开页面，不是回调
+
+    var verifier = sessionStorage.getItem(PKCE_VERIFIER);
+    var savedState = sessionStorage.getItem(PKCE_STATE);
+    var clientId = sessionStorage.getItem(PKCE_CLIENT);
+
+    if (!verifier || !clientId) {
+      toast('授权校验失败：缺少 PKCE 参数，请重新点击「授权并连接」');
+      history.replaceState({}, '', location.pathname);
+      return;
+    }
+    if (savedState && savedState !== stateParam) {
+      toast('授权校验失败：state 不匹配（可能被篡改）');
       history.replaceState({}, '', location.pathname);
       return;
     }
 
-    var pk = pkKeyEl.value.trim();
-    var redirectUri = location.href.split('#')[0];
+    oauthHint.textContent = '正在用授权码换取密钥…';
+
+    var body = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: code,
+      client_id: clientId,
+      redirect_uri: REDIRECT_URI,
+      code_verifier: verifier
+    });
 
     fetch(AUTH_BASE + '/api/oauth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code,
-        client_id: pk,
-        redirect_uri: redirectUri,
-        code_verifier: verifier
-      })
+      body: body
     })
-    .then(function (res) {
-      if (!res.ok) throw new Error('换取密钥失败 HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function (data) {
-      if (!data.access_token) throw new Error('响应中没有 access_token');
-      sessionStorage.setItem(SCOPED_STORE, data.access_token);
-      sessionStorage.removeItem('pkce_verifier');
-      sessionStorage.removeItem('pkce_state');
+    .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, data: d }; }); })
+    .then(function (r) {
+      if (!r.ok || !r.data.access_token) {
+        throw new Error(r.data.error_description || r.data.error || ('HTTP ' + (r.data.status || '未知')));
+      }
+      var token = r.data.access_token;
+      sessionStorage.setItem(SCOPED_STORE, token);
+      sessionStorage.removeItem(PKCE_VERIFIER);
+      sessionStorage.removeItem(PKCE_STATE);
+      sessionStorage.removeItem(PKCE_CLIENT);
       history.replaceState({}, '', location.pathname);
-      toast('授权成功，密钥已就绪（仅本次会话有效）');
-      useScopedBtn.style.display = '';
-      oauthHint.textContent = '已获取 scoped 密钥，点击"使用授权密钥"即可开始生成。';
+      return loadUserInfo(token);
+    })
+    .then(function (ui) {
+      if (ui) sessionStorage.setItem(USERINFO_STORE, JSON.stringify(ui));
+      showConnected(ui);
+      toast('官方 BYOP 授权成功，已连接你的账户');
+      oauthHint.textContent = '已连接。生成时使用的是你授权的限权密钥（本次会话有效）。';
     })
     .catch(function (err) {
       toast('授权失败：' + err.message);
+      oauthHint.textContent = '';
       history.replaceState({}, '', location.pathname);
     });
   }
 
+  function loadUserInfo(token) {
+    return fetch(AUTH_BASE + '/api/oauth/userinfo', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function (res) {
+      if (!res.ok) return null;
+      return res.json();
+    }).catch(function () { return null; });
+  }
+
   // ---------------- 工具 ----------------
+  function safeParse(s) { try { return s ? JSON.parse(s) : null; } catch (e) { return null; } }
   function escapeHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
