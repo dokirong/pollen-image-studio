@@ -562,7 +562,7 @@
     if ($('sizeLabelEl')) $('sizeLabelEl').textContent = L.sizeLabel;
     if ($('modelLabelEl')) $('modelLabelEl').textContent = L.modelLabel;
     var mr = $('modalRegion');
-    if (mr && uiRegion) mr.textContent = (uiLang === 'zh' ? 'IP 地区：' : 'IP Region: ') + uiRegion;
+    if (mr && uiRegion) mr.textContent = (uiLang === 'zh' ? 'IP 地区：' : 'IP Region: ') + locName(uiRegion);
     if ($('modalTitle')) $('modalTitle').textContent = L.modalTitle;
     if ($('modalDesc')) $('modalDesc').textContent = L.modalDesc;
     if (startOAuthBtn) startOAuthBtn.textContent = L.btnOAuth;
@@ -624,10 +624,10 @@
       applyLang();
     });
 
-    // IP 强制一切：默认英文；IP 为中国才切中文；结果写入登录模态框地区行
+    // IP 强制一切：默认英文；IP 为中国(含港澳台)才切中文；结果写入登录模态框地区行
     detectCountry().then(function (country) {
-      var cn = /China|中国/.test(country || '');
-      uiRegion = country || (cn ? 'China' : 'Unknown');
+      var cn = isChina(country);
+      uiRegion = country || (cn ? 'CN' : 'US');
       uiLang = cn ? 'zh' : 'en';
       applyLang();  // applyLang 内会按当前语言渲染 IP 地区行
     });
@@ -789,17 +789,31 @@
 
   // ---------------- IP 检测 + 中英转换 ----------------
   var detectPromise = null, userCountry = '', translated = false, finalPrompt = promptEl.value;
+  // IP 归属检测：Cloudflare 1.1.1.1/cdn-cgi/trace —— 全球极快(毫秒级)、CORS开放、返回 loc=两个字母国码
+  var detectPromise = null, userCountry = '', translated = false, finalPrompt = promptEl.value;
   function detectCountry() {
     if (detectPromise) return detectPromise;
-    var p = fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
-      .then(function (r) { if (!r.ok) throw new Error('ipapi ' + r.status); return r.json(); })
-      .then(function (d) {
-        userCountry = (d && d.country_name) ? (d.country_name + (d.city ? '（' + d.city + '）' : '')) : '';
-        return userCountry;
+    var p = fetch('https://1.1.1.1/cdn-cgi/trace', { signal: AbortSignal.timeout(5000) })
+      .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+      .then(function (txt) {
+        var loc = '';
+        txt.split('\n').forEach(function (line) {
+          if (line.indexOf('loc=') === 0) loc = line.slice(4).trim();
+        });
+        return loc;
       })
-      .catch(function () { userCountry = ''; return userCountry; });
+      .catch(function () { return ''; });
+    p.then(function (c) { userCountry = c || ''; });
     detectPromise = p;
     return p;
+  }
+  // 是否中国/港澳台：loc 国码 CN/HK/MO/TW / 名称 China/中国/Hong Kong/香港/Macau/澳门/Taiwan/台湾
+  function isChina(x) { return /^(CN|HK|MO|TW)$|China|中国|Hong Kong|香港|Macau|澳门|Taiwan|台湾/i.test(x || ''); }
+  // loc 两字母国码 → 可读名称（用于模态框地区显示）
+  var LOC_NAMES = { CN: 'China', HK: 'Hong Kong', MO: 'Macau', TW: 'Taiwan', US: 'United States', CA: 'Canada', JP: 'Japan', KR: 'South Korea', SG: 'Singapore', GB: 'United Kingdom', DE: 'Germany', FR: 'France', AU: 'Australia', IN: 'India', RU: 'Russia' };
+  function locName(c) {
+    var key = String(c || '').trim().toUpperCase();
+    return LOC_NAMES[key] || key;
   }
   function hasCJK(s) { return /[\u4e00-\u9fff\u3400-\u4dbf]/.test(s || ''); }
   // 用 Pollinations 官方【免费】文本接口翻译，不消耗用户 Pollen 额度；不可用时回退原文
