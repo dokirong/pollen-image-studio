@@ -49,7 +49,6 @@
   }
   .logo-text .sub { color: #d9c8de; font-size: 13px; margin-top: 8px; letter-spacing: 1px; }
   .topbar-login { flex: 0 0 auto; max-width: 380px; min-width: 240px; }
-  .topbar-login .byop-primary { margin: 0; }
   .topbar-login .connected { margin-top: 0; }
   @media (max-width: 720px) {
     .topbar { flex-direction: column; align-items: stretch; }
@@ -117,11 +116,6 @@
   .btn-sm { padding: 8px 14px; font-size: 13px; }
 
   /* ---------- BYOP 主连接区 ---------- */
-  .byop-primary {
-    background: linear-gradient(135deg, #fff4f8 0%, #f3ecff 100%);
-    border: 2px solid #f0d6e6;
-    border-radius: 14px; padding: 16px;
-  }
   .byop-title { font-size: 15px; font-weight: 800; color: var(--pink-deep); }
   .byop-desc { font-size: 12px; color: var(--ink-soft); line-height: 1.6; margin: 6px 0 4px; }
   .opt-row { display: flex; gap: 12px; }
@@ -148,9 +142,9 @@
     cursor: pointer; transition: border-color .2s, background .2s;
   }
   .model-item input { display: none; }
-  .model-item .m-name { font-size: 14px; font-weight: 700; color: var(--ink); display: flex; justify-content: space-between; align-items: center; }
-  .model-item .m-desc { font-size: 12px; color: #9a8595; margin-top: 4px; line-height: 1.4; }
-  .model-item .m-price { font-size: 11px; color: var(--pink-deep); font-weight: 700; background: #ffe3ee; padding: 2px 8px; border-radius: 999px; }
+  .model-item .m-name { font-size: 17px; font-weight: 800; color: var(--ink); }
+  .model-item .m-desc { font-size: 12px; color: #9a8595; margin-top: 6px; line-height: 1.4; }
+  .model-item .m-price { display: block; width: fit-content; font-size: 12px; color: var(--pink-deep); font-weight: 700; background: #ffe3ee; padding: 3px 10px; border-radius: 999px; margin-top: 10px; }
   .model-item.selected { border-color: var(--pink-deep); background: #fff4f8; }
   .model-item.selected::after {
     content: "已选"; position: absolute; top: -9px; right: 10px;
@@ -235,6 +229,35 @@
     max-width: 90vw; text-align: center;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---------- 登录模态框 ---------- */
+  .modal-mask {
+    position: fixed; inset: 0; z-index: 120;
+    background: rgba(46,36,51,.55);
+    -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-mask.hidden { display: none; }
+  .modal {
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    max-width: 420px; width: 100%;
+    padding: 32px 28px 26px;
+    text-align: center;
+    animation: modalIn .26s ease;
+  }
+  @keyframes modalIn { from { transform: translateY(18px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-badge {
+    width: 64px; height: 64px; border-radius: 18px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--lavender-deep) 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow);
+  }
+  .modal-title { font-size: 21px; color: var(--ink); font-weight: 800; margin-bottom: 10px; }
+  .modal-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.7; margin-bottom: 22px; }
 </style>
 </head>
 <body>
@@ -259,24 +282,18 @@
     </div>
 
     <div class="topbar-login">
-      <div class="byop-primary">
-        <button class="btn btn-primary" id="startOAuth" type="button">授权并连接</button>
-
-        <!-- 已连接状态 -->
-        <div class="connected" id="connectedBox" style="display:none;">
-          <img id="connAvatar" alt="">
-          <div>
-            <div class="conn-name" id="connName"></div>
-            <div class="conn-sub" id="connSub"></div>
-          </div>
-          <button class="btn btn-soft btn-sm" id="disconnectBtn" type="button">退出连接</button>
+      <!-- 已连接状态（登录后显示） -->
+      <div class="connected" id="connectedBox" style="display:none;">
+        <img id="connAvatar" alt="">
+        <div>
+          <div class="conn-name" id="connName"></div>
+          <div class="conn-sub" id="connSub"></div>
         </div>
-        <div class="hint" id="oauthHint"></div>
-
-        <!-- 授权流程所需参数（回调地址/有效期/额度），已写死在代码中，不展示给用户 -->
-        <input type="hidden" id="pkExpiry" value="7">
-        <input type="hidden" id="pkBudget">
+        <button class="btn btn-soft btn-sm" id="disconnectBtn" type="button">退出连接</button>
       </div>
+      <!-- 授权流程所需参数（回调地址/有效期/额度），已写死在代码中，不展示给用户 -->
+      <input type="hidden" id="pkExpiry" value="7">
+      <input type="hidden" id="pkBudget">
     </div>
   </header>
 
@@ -336,6 +353,25 @@
     构建 · 接口 POST https://gen.pollinations.ai/v1/images/generations
     <br>图片由 AI 生成，请注意内容合规。如遇 429/503，请稍后重试。
   </footer>
+</div>
+
+<!-- 登录模态框：载入页面时弹出 -->
+<div class="modal-mask" id="loginModal">
+  <div class="modal">
+    <div class="modal-badge">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3c1.6 2.3 1.6 4.7 0 7-1.6-2.3-1.6-4.7 0-7z" fill="#fff"/>
+        <path d="M7 6.5c1 1.5 1 3.1 0 4.6-1-1.5-1-3.1 0-4.6z" fill="#fff" opacity=".8"/>
+        <path d="M17 6.5c1 1.5 1 3.1 0 4.6-1-1.5-1-3.1 0-4.6z" fill="#fff" opacity=".8"/>
+        <rect x="4.5" y="13" width="15" height="3" rx="1.5" fill="#fff" opacity=".9"/>
+        <rect x="7" y="17.5" width="10" height="2.2" rx="1.1" fill="#fff" opacity=".7"/>
+      </svg>
+    </div>
+    <h3 class="modal-title">登录以开始创作</h3>
+    <p class="modal-desc">使用你的 Pollinations 账户完成官方 BYOP 授权，即可用你自己的 Pollen 额度生成图片。限权密钥仅保存在本次会话，可随时在后台撤销。</p>
+    <button class="btn btn-primary btn-block" id="startOAuth" type="button">授权并连接</button>
+    <div class="hint" id="oauthHint"></div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -422,6 +458,11 @@
       });
     });
 
+    // 未连接且不是 OAuth 回调页 -> 载入即弹出登录模态框
+    if (!scoped && !new URLSearchParams(location.search).get('code')) {
+      showLoginModal();
+    }
+
     // 若是 OAuth 回调（带 ?code= 或 ?error=），在此处理
     handleOAuthCallback();
   }
@@ -434,11 +475,12 @@
       label.className = 'model-item' + (m.id === state.model ? ' selected' : '');
       label.dataset.id = m.id;
       var priceHtml = m.price !== null
-        ? '<span class="m-price">约 ' + m.price + ' ' + (m.unit || 'pollen') + '/张</span>'
-        : '<span class="m-price" style="background:#e7e0f5;color:#7c63c9;">按模型定价</span>';
+        ? '<div class="m-price">约 ' + m.price + ' ' + (m.unit || 'pollen') + '/张</div>'
+        : '<div class="m-price" style="background:#e7e0f5;color:#7c63c9;">按模型定价</div>';
       label.innerHTML =
         '<input type="radio" name="model" value="' + m.id + '"' + (m.id === state.model ? ' checked' : '') + '>' +
-        '<div class="m-name"><span>' + m.name + '</span>' + priceHtml + '</div>' +
+        '<div class="m-name">' + m.name + '</div>' +
+        priceHtml +
         '<div class="m-desc">' + m.desc + '</div>';
       label.addEventListener('click', function () {
         document.querySelectorAll('.model-item').forEach(function (x) { x.classList.remove('selected'); });
@@ -507,9 +549,20 @@
     keyStatus.textContent = ok ? '密钥已保存到本机浏览器（备用路径）。' : '未填写。';
   }
 
+  // 登录模态框显隐
+  function showLoginModal() {
+    var m = $('loginModal');
+    if (m) m.classList.remove('hidden');
+  }
+  function hideLoginModal() {
+    var m = $('loginModal');
+    if (m) m.classList.add('hidden');
+  }
+
   // 已连接状态展示
   function showConnected(ui) {
     connectedBox.style.display = '';
+    hideLoginModal();
     if (ui && ui.preferred_username) {
       connName.textContent = '@' + ui.preferred_username;
       connSub.textContent = '已通过官方 BYOP 授权连接';
@@ -529,6 +582,7 @@
     connectedBox.style.display = 'none';
     oauthHint.textContent = '已退出连接。';
     toast('已退出连接');
+    showLoginModal();
   }
 
   // ---------------- 生成 ----------------
@@ -543,7 +597,7 @@
     var prompt = promptEl.value.trim();
     var model = currentModel();
 
-    if (!key) { toast('请先连接账户（官方授权）或填写 sk_ 密钥'); return; }
+    if (!key) { toast('请先连接账户（官方授权）或填写 sk_ 密钥'); showLoginModal(); return; }
     if (!prompt) { toast('请先填写提示词'); return; }
     if (!model) { toast('请填写自定义模型 ID'); return; }
 
