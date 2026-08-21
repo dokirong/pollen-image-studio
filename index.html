@@ -256,27 +256,6 @@
         <h2><span class="dot dot-pink"></span>一、连接你的 Pollen 账户</h2>
 
         <div class="byop-primary">
-          <div class="byop-title">官方 BYOP 授权登录（推荐）</div>
-          <p class="byop-desc">用你自己的 Pollen 额度生成图片。限权密钥只存在本次会话（sessionStorage），可随时在 Pollinations 后台撤销。</p>
-
-          <label>把下面这个回调地址，加到你 App Key 的 Redirect URI</label>
-          <div class="key-row">
-            <input type="text" id="redirectUri" readonly>
-            <button class="btn btn-soft btn-sm" id="copyUri" type="button">复制</button>
-          </div>
-          <div class="hint">本应用已内置你的 App Key。请打开 <a class="byop-link" href="https://enter.pollinations.ai/keys" target="_blank" rel="noopener">enter.pollinations.ai/keys</a>，把这串回调地址原样填进对应 App Key 的「Redirect URI」并保存。</div>
-
-          <div class="opt-row">
-            <div>
-              <label for="pkExpiry">密钥有效期（天）</label>
-              <input type="number" id="pkExpiry" value="7" min="1" max="365">
-            </div>
-            <div>
-              <label for="pkBudget">额度上限（留空=由你后台设）</label>
-              <input type="text" id="pkBudget" placeholder="如 10">
-            </div>
-          </div>
-
           <button class="btn btn-primary btn-block" id="startOAuth" type="button">授权并连接</button>
 
           <!-- 已连接状态 -->
@@ -289,9 +268,15 @@
             <button class="btn btn-soft btn-sm" id="disconnectBtn" type="button">退出连接</button>
           </div>
           <div class="hint" id="oauthHint"></div>
+
+          <!-- 授权流程所需参数，已内置默认值，不展示给用户 -->
+          <input type="hidden" id="redirectUri">
+          <button class="btn btn-soft btn-sm" id="copyUri" type="button" style="display:none">复制</button>
+          <input type="hidden" id="pkExpiry" value="7">
+          <input type="hidden" id="pkBudget">
         </div>
 
-        <details class="byop">
+        <details class="byop" style="display:none">
           <summary>或：直接粘贴 sk_ 密钥（仅开发 / 自用，非官方推荐）</summary>
           <div class="body">
             <label for="apiKey">API Key（sk_ 开头）</label>
