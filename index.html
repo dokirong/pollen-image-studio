@@ -152,18 +152,18 @@
   .connected .btn { margin-left: auto; }
 
   /* ---------- 模型卡片 ---------- */
-  /* 参考提示词卡片 + 随机按钮 */
-  .ref-row { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-  .ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  /* 参考提示词卡片 + 随机按钮（同一排横排） */
+  .ref-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+  .random-btn { flex: 0 0 auto; }
+  .ref-grid { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
   .ref-card {
-    border: 2px solid #e6ddf2; background: var(--card-2); border-radius: 12px;
-    padding: 8px 8px; cursor: pointer; transition: all .2s;
+    border: 2px solid #e6ddf2; background: var(--card-2); border-radius: 10px;
+    padding: 6px 10px; cursor: pointer; transition: all .2s;
     font-size: 12px; font-weight: 700; color: var(--lavender-deep);
-    display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.25;
-    min-height: 40px;
+    display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.2;
+    flex: 1 1 auto; min-width: 88px; white-space: nowrap;
   }
   .ref-card:hover { background: #fbe9f2; border-color: var(--pink); color: var(--pink-deep); }
-  .random-btn { align-self: flex-start; }
 
   /* 模型卡片：横排紧凑（前：模型名 · 后：分辨率 + 价格） */
   .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -433,7 +433,10 @@
   var REF_PROMPTS = [
     { title: '数学信息图', p: '高中二年级数学全部知识信息图' },
     { title: '开发信息图', p: '游戏开发策划运营信息图' },
-    { title: '美术武侠图', p: '满脸沧桑的游侠，目光锐利，凌乱发丝，横着剑身金粉弥散，暗黑风格，构图采用黄金分割，强化人物情感，负空间策略性地烘托侠客的孤独与坚定。电影级高分辨率、大师级摄影、超现实细节、顶级影视海报美术平面设计艺术感' }
+    { title: '美术武侠图', p: '满脸沧桑的游侠，目光锐利，凌乱发丝，横着剑身金粉弥散，暗黑风格，构图采用黄金分割，强化人物情感，负空间策略性地烘托侠客的孤独与坚定。电影级高分辨率、大师级摄影、超现实细节、顶级影视海报美术平面设计艺术感' },
+    { title: '我欲封天海报', p: '电影海报，大师排版，顶级设计，金箔材质的书法字"我欲封天"位于图片下方三分之一处，字体奔放，笔画飘逸飞白，墨色对比强烈，笔势细腻，字形结构夸张变形呈现张力，参考以下细节：笔法：逆锋起笔/横扫收笔，中锋侧锋交替节奏：快慢交替章法：字间大小悬殊（最大字是最小字的3倍）。英文小字"WOYUFENGTIAN"，红色小篆印章"耳根 著"。白衣仙人，腾空姿态，背对镜头，疯狂长散发与仙气长衣往镜头飞扬遮挡，动态张力，仰视视角，主体（仙人）居下+巨兽（黑龙）居上，腾空与仙门蜀山山巅与天空仰视黑龙，冷色调（灰蓝黑主色，绿棕副色调），低饱和暗调，逆强光氛围，光束穿透感，局部高光（剑刃/龙鳞），东方玄幻，震撼临场感，史诗场景' },
+    { title: '神明挥刀图', p: '奇幻写实风格，神明世界里狂风呼啸，空间扭曲变形，巨手带着强大的气势降临，各样有形的气流顺着人物面对的方向汹涌而去，巨大压力下努力维持蓄势挥刀姿态，散发着丝丝杀意，风卷着残叶，仿佛要将面前的一切都摧毁，画面采用侧视角，以冷色调为主，增强画面的冲击力。动态模糊强化携带速度线残影，超广角强透视构图，动态模糊边缘虚化，强烈胶片颗粒与高噪点质感，弥散晕染的暗部层次，张力十足，压迫感，细节生动完美。威胁压迫感，极其震撼的一幕，光影彼此交织错杂的梦幻感，朦胧，过曝，双重曝光，电影级构图，视觉冲击，8K画质，超清，极致细节，极致刻画，清晰的线条，高对比。对命运的不公。' },
+    { title: '白衣法阵图', p: '尖锐特写，无限细节。极繁主义，色彩鲜明，立体感十足，光影艺术，空间纵深感 超现实玄幻仙侠，酸性美学，低角度对角倾斜仰视过肩镜头，画面底部角落一名全身丝绸白衣的白色长发男修士背对镜举发光仙剑剑指阵法，地面幻化一道道巨大且虚幻的黑金岩浆光环，四处飘动各种黑金粒子和无数条印有经文的金色透明光带，黑金能量束穿透黑暗能量层，曜变釉面反射多重曝光光斑。混沌交织的虚空中云雾笼罩且金光闪耀，金色粒子汇聚成金色半透明的法阵漩涡，漩涡四周边界融化于云层中，数以万计的外形似剑的金光和金色经文极速下落，CG渲染，全身，巨大比例，C4D，Blender，虚幻引擎，Octane渲染器，全局光照，光线追踪反射，屏幕空间环境光遮蔽，着色器，快速近似抗锯齿，计算机生成图像，RTX，视觉特效，4K 分辨率，最佳画质，极致细节，超写实，暗黑风格，昏暗，梦幻，史诗，压迫感，能见度极低，大量阴影和留白，极具视觉冲击的压迫感的构图，低饱和度，低亮度，巨物恐惧，故事感，高级感，动态感' }
   ];
 
   var SIZES = ['512x512', '768x768', '1024x1024', '768x1024', '1024x768', '512x768', '768x512', '1536x1024', '1024x576', '1536x864', '576x1024', '864x1536'];
