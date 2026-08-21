@@ -449,12 +449,12 @@
   ];
 
   var REF_PROMPTS = [
-    { title: '数学信息图', full: '数学信息图', p: '高中二年级数学全部知识信息图' },
-    { title: '开发信息图', full: '开发信息图', p: '游戏开发策划运营信息图' },
-    { title: '美术武侠图', full: '美术武侠图', p: '满脸沧桑的游侠，目光锐利，凌乱发丝，横着剑身金粉弥散，暗黑风格，构图采用黄金分割，强化人物情感，负空间策略性地烘托侠客的孤独与坚定。电影级高分辨率、大师级摄影、超现实细节、顶级影视海报美术平面设计艺术感' },
-    { title: '我欲封天', full: '我欲封天海报', p: '电影海报，大师排版，顶级设计，金箔材质的书法字"我欲封天"位于图片下方三分之一处，字体奔放，笔画飘逸飞白，墨色对比强烈，笔势细腻，字形结构夸张变形呈现张力，参考以下细节：笔法：逆锋起笔/横扫收笔，中锋侧锋交替节奏：快慢交替章法：字间大小悬殊（最大字是最小字的3倍）。英文小字"WOYUFENGTIAN"，红色小篆印章"耳根 著"。白衣仙人，腾空姿态，背对镜头，疯狂长散发与仙气长衣往镜头飞扬遮挡，动态张力，仰视视角，主体（仙人）居下+巨兽（黑龙）居上，腾空与仙门蜀山山巅与天空仰视黑龙，冷色调（灰蓝黑主色，绿棕副色调），低饱和暗调，逆强光氛围，光束穿透感，局部高光（剑刃/龙鳞），东方玄幻，震撼临场感，史诗场景' },
-    { title: '神明挥刀', full: '神明挥刀图', p: '奇幻写实风格，神明世界里狂风呼啸，空间扭曲变形，巨手带着强大的气势降临，各样有形的气流顺着人物面对的方向汹涌而去，巨大压力下努力维持蓄势挥刀姿态，散发着丝丝杀意，风卷着残叶，仿佛要将面前的一切都摧毁，画面采用侧视角，以冷色调为主，增强画面的冲击力。动态模糊强化携带速度线残影，超广角强透视构图，动态模糊边缘虚化，强烈胶片颗粒与高噪点质感，弥散晕染的暗部层次，张力十足，压迫感，细节生动完美。威胁压迫感，极其震撼的一幕，光影彼此交织错杂的梦幻感，朦胧，过曝，双重曝光，电影级构图，视觉冲击，8K画质，超清，极致细节，极致刻画，清晰的线条，高对比。对命运的不公。' },
-    { title: '白衣法阵', full: '白衣法阵图', p: '尖锐特写，无限细节。极繁主义，色彩鲜明，立体感十足，光影艺术，空间纵深感 超现实玄幻仙侠，酸性美学，低角度对角倾斜仰视过肩镜头，画面底部角落一名全身丝绸白衣的白色长发男修士背对镜举发光仙剑剑指阵法，地面幻化一道道巨大且虚幻的黑金岩浆光环，四处飘动各种黑金粒子和无数条印有经文的金色透明光带，黑金能量束穿透黑暗能量层，曜变釉面反射多重曝光光斑。混沌交织的虚空中云雾笼罩且金光闪耀，金色粒子汇聚成金色半透明的法阵漩涡，漩涡四周边界融化于云层中，数以万计的外形似剑的金光和金色经文极速下落，CG渲染，全身，巨大比例，C4D，Blender，虚幻引擎，Octane渲染器，全局光照，光线追踪反射，屏幕空间环境光遮蔽，着色器，快速近似抗锯齿，计算机生成图像，RTX，视觉特效，4K 分辨率，最佳画质，极致细节，超写实，暗黑风格，昏暗，梦幻，史诗，压迫感，能见度极低，大量阴影和留白，极具视觉冲击的压迫感的构图，低饱和度，低亮度，巨物恐惧，故事感，高级感，动态感' }
+    { key: 'refMath',   fullKey: 'refMathF',   p: '高中二年级数学全部知识信息图' },
+    { key: 'refDev',    fullKey: 'refDevF',    p: '游戏开发策划运营信息图' },
+    { key: 'refWuxia',  fullKey: 'refWuxiaF',  p: '满脸沧桑的游侠，目光锐利，凌乱发丝，横着剑身金粉弥散，暗黑风格，构图采用黄金分割，强化人物情感，负空间策略性地烘托侠客的孤独与坚定。电影级高分辨率、大师级摄影、超现实细节、顶级影视海报美术平面设计艺术感' },
+    { key: 'refFengtian', fullKey: 'refFengtianF', p: '电影海报，大师排版，顶级设计，金箔材质的书法字"我欲封天"位于图片下方三分之一处，字体奔放，笔画飘逸飞白，墨色对比强烈，笔势细腻，字形结构夸张变形呈现张力，参考以下细节：笔法：逆锋起笔/横扫收笔，中锋侧锋交替节奏：快慢交替章法：字间大小悬殊（最大字是最小字的3倍）。英文小字"WOYUFENGTIAN"，红色小篆印章"耳根 著"。白衣仙人，腾空姿态，背对镜头，疯狂长散发与仙气长衣往镜头飞扬遮挡，动态张力，仰视视角，主体（仙人）居下+巨兽（黑龙）居上，腾空与仙门蜀山山巅与天空仰视黑龙，冷色调（灰蓝黑主色，绿棕副色调），低饱和暗调，逆强光氛围，光束穿透感，局部高光（剑刃/龙鳞），东方玄幻，震撼临场感，史诗场景' },
+    { key: 'refDao',    fullKey: 'refDaoF',    p: '奇幻写实风格，神明世界里狂风呼啸，空间扭曲变形，巨手带着强大的气势降临，各样有形的气流顺着人物面对的方向汹涌而去，巨大压力下努力维持蓄势挥刀姿态，散发着丝丝杀意，风卷着残叶，仿佛要将面前的一切都摧毁，画面采用侧视角，以冷色调为主，增强画面的冲击力。动态模糊强化携带速度线残影，超广角强透视构图，动态模糊边缘虚化，强烈胶片颗粒与高噪点质感，弥散晕染的暗部层次，张力十足，压迫感，细节生动完美。威胁压迫感，极其震撼的一幕，光影彼此交织错杂的梦幻感，朦胧，过曝，双重曝光，电影级构图，视觉冲击，8K画质，超清，极致细节，极致刻画，清晰的线条，高对比。对命运的不公。' },
+    { key: 'refArray',  fullKey: 'refArrayF',  p: '尖锐特写，无限细节。极繁主义，色彩鲜明，立体感十足，光影艺术，空间纵深感 超现实玄幻仙侠，酸性美学，低角度对角倾斜仰视过肩镜头，画面底部角落一名全身丝绸白衣的白色长发男修士背对镜举发光仙剑剑指阵法，地面幻化一道道巨大且虚幻的黑金岩浆光环，四处飘动各种黑金粒子和无数条印有经文的金色透明光带，黑金能量束穿透黑暗能量层，曜变釉面反射多重曝光光斑。混沌交织的虚空中云雾笼罩且金光闪耀，金色粒子汇聚成金色半透明的法阵漩涡，漩涡四周边界融化于云层中，数以万计的外形似剑的金光和金色经文极速下落，CG渲染，全身，巨大比例，C4D，Blender，虚幻引擎，Octane渲染器，全局光照，光线追踪反射，屏幕空间环境光遮蔽，着色器，快速近似抗锯齿，计算机生成图像，RTX，视觉特效，4K 分辨率，最佳画质，极致细节，超写实，暗黑风格，昏暗，梦幻，史诗，压迫感，能见度极低，大量阴影和留白，极具视觉冲击的压迫感的构图，低饱和度，低亮度，巨物恐惧，故事感，高级感，动态感' }
   ];
 
   var SIZES = ['512x512', '768x768', '1024x1024', '768x1024', '1024x768', '512x768', '768x512', '1536x1024', '1024x576', '1536x864', '576x1024', '864x1536'];
@@ -490,7 +490,13 @@
       placeholder: '例如：a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere',
       resultTitle: '生成结果', noResult: '还没有生成图片，在左侧填写提示词后点击「生成图片」即可。', writePrompt: '写下你的画面',
       transBadge: '已自动译英', loading: '正在创作你的画面，请稍候…', loadingWarn: '生成通常需要 10~60 秒，请勿关闭页面',
-      genErr: '生成失败：', modelLabel: '模型（前：名称 · 后：分辨率 · 价格）', sizeLabel: '尺寸'
+      genErr: '生成失败：', modelLabel: '模型（前：名称 · 后：分辨率 · 价格）', sizeLabel: '尺寸',
+      customName: '自定义模型', customId: '模型 ID', customPh: '例如 rodrigookk/z-image-turbo',
+      pricePer: '/张', bdPrice: '按模型定价', ricePrefix: '约 ',
+      orientSquare: '正方', orientPortrait: '竖图', orientLandscape: '横图',
+      randomBtn: '随机看看', show: '显示', hide: '隐藏',
+      refMath: '数学信息图', refDev: '开发信息图', refWuxia: '美术武侠图', refFengtian: '我欲封天', refDao: '神明挥刀', refArray: '白衣法阵',
+      refMathF: '数学信息图', refDevF: '开发信息图', refWuxiaF: '美术武侠图', refFengtianF: '我欲封天海报', refDaoF: '神明挥刀图', refArrayF: '白衣法阵图'
     },
     en: {
       labelPrompt: 'Prompt', btnLang: 'EN', btnGen: 'Generate', btnGenBusy: 'Generating…', btnTrans: 'Translating…',
@@ -500,7 +506,13 @@
       placeholder: 'e.g. a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere',
       resultTitle: 'Result', noResult: 'Nothing generated yet. Fill in a prompt on the left and click Generate.', writePrompt: 'Describe your image',
       transBadge: 'Auto-translated to EN', loading: 'Creating your image…', loadingWarn: 'Usually takes 10-60s. Keep this page open.',
-      genErr: 'Generation failed: ', modelLabel: 'Models (name · size · price)', sizeLabel: 'Size'
+      genErr: 'Generation failed: ', modelLabel: 'Models (name · size · price)', sizeLabel: 'Size',
+      customName: 'Custom', customId: 'Model ID', customPh: 'e.g. rodrigookk/z-image-turbo',
+      pricePer: '/img', bdPrice: 'Model price', ricePrefix: '~',
+      orientSquare: 'Square', orientPortrait: 'Portrait', orientLandscape: 'Landscape',
+      randomBtn: 'Random', show: 'Show', hide: 'Hide',
+      refMath: 'Math Chart', refDev: 'Dev Chart', refWuxia: 'Wuxia Art', refFengtian: 'Fengtian', refDao: 'Sword of God', refArray: 'White Array',
+      refMathF: 'Math Infographic', refDevF: 'Dev Infographic', refWuxiaF: 'Wuxia Poster', refFengtianF: 'Fengtian Poster', refDaoF: 'God Sword Poster', refArrayF: 'White-Robe Array'
     }
   };
   var uiLang = localStorage.getItem(LANG_STORE) === 'en' ? 'en' : 'zh';
@@ -520,6 +532,12 @@
     if (transNote) { transNote.textContent = L.transBadge; if (translated) transNote.style.display = ''; }
     if (connSub) connSub.textContent = L.connSub;
     if ($('placeholderBox')) $('placeholderBox').innerHTML = L.noResult;
+    if ($('randomBtn')) $('randomBtn').textContent = L.randomBtn;
+    var tk = $('toggleKey');
+    if (tk) tk.textContent = apiKeyEl && apiKeyEl.type === 'password' ? L.show : L.hide;
+    buildModelGrid();
+    buildSizeRow();
+    buildRefGrid();
     document.title = uiLang === 'en' ? 'Pollen Image Studio' : 'Pollen 生图工坊';
   }
 
@@ -580,11 +598,11 @@
       label.className = 'model-item' + (m.id === state.model ? ' selected' : '');
       label.dataset.id = m.id;
       var priceHtml = m.price !== null
-        ? '约 ' + m.price + ' ' + (m.unit || 'pollen') + '/张'
-        : '按模型定价';
+        ? t('ricePrefix') + ' ' + m.price + ' ' + (m.unit || 'pollen') + t('pricePer')
+        : t('bdPrice');
       label.innerHTML =
         '<input type="radio" name="model" value="' + m.id + '"' + (m.id === state.model ? ' checked' : '') + '>' +
-        '<span class="m-name">' + m.name + '</span>' +
+        '<span class="m-name">' + modelName(m.id) + '</span>' +
         '<span class="m-meta"><span class="m-res">' + resStr + '</span><span class="m-price">' + priceHtml + '</span></span>';
       label.addEventListener('click', function () {
         document.querySelectorAll('.model-item').forEach(function (x) { x.classList.remove('selected'); });
@@ -603,7 +621,7 @@
         var wrap = document.createElement('div');
         wrap.id = 'customModelWrap';
         wrap.style.marginTop = '6px';
-        wrap.innerHTML = '<label for="customModel">模型 ID</label><input type="text" id="customModel" placeholder="例如 rodrigookk/z-image-turbo">';
+        wrap.innerHTML = '<label for="customModel">' + t('customId') + '</label><input type="text" id="customModel" placeholder="' + t('customPh') + '">';
         grid.appendChild(wrap);
         $('customModel').addEventListener('input', function () { state.customModel = this.value.trim(); });
       }
@@ -617,7 +635,7 @@
     function gcd(a, b) { return b ? gcd(b, a % b) : a; }
     var g = gcd(w, h);
     var rw = w / g, rh = h / g;
-    var orient = (w === h) ? '正方' : (h > w ? '竖图' : '横图');
+    var orient = (w === h) ? t('orientSquare') : (h > w ? t('orientPortrait') : t('orientLandscape'));
     return rw + ':' + rh + ' ' + orient;
   }
 
@@ -650,8 +668,8 @@
     REF_PROMPTS.forEach(function (it) {
       var c = document.createElement('div');
       c.className = 'ref-card';
-      c.textContent = it.title;
-      c.title = it.full || it.title;
+      c.textContent = t(it.key);
+      c.title = t(it.fullKey) || t(it.key);
       c.addEventListener('click', function () {
         promptEl.value = it.p;
         promptEl.focus();
@@ -750,6 +768,10 @@
   function currentModel() {
     if (state.model === 'custom') return state.customModel || '';
     return state.model;
+  }
+  function modelName(mId) {
+    if (mId === 'custom') return t('customName');
+    return mId;
   }
 
   function onGenerate() {
