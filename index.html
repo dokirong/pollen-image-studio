@@ -202,6 +202,12 @@
   .size-chip.selected .size-dim, .size-chip.selected .size-ratio { color: #2e6b52; }
 
   /* ---------- 状态 ---------- */
+  .trans-note {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--mint-deep); font-weight: 700;
+    background: rgba(168,230,207,.22); border: 1px dashed rgba(92,201,163,.6);
+    padding: 2px 8px; border-radius: 999px; margin-left: 6px; white-space: nowrap;
+  }
   .status-bar { display: flex; align-items: center; gap: 10px; margin-top: 14px; min-height: 26px; }
   .status-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
   .st-ok { background: var(--mint-deep); }
@@ -331,7 +337,7 @@
     <div>
       <div class="card">
         <h2><span class="dot dot-mint"></span>写下你的画面</h2>
-        <label for="prompt">提示词（英文效果更佳，支持中文）</label>
+        <label for="prompt">提示词<span class="trans-note" id="transNote" style="display:none"></span></label>
         <textarea id="prompt" placeholder="例如：a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere"></textarea>
         <div class="ref-row">
           <button class="btn btn-ghost btn-sm random-btn" id="randomBtn" type="button">随机看看</button>
@@ -454,7 +460,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var apiKeyEl = $('apiKey');
   var pkExpiryEl = $('pkExpiry'), pkBudgetEl = $('pkBudget');
-  var promptEl = $('prompt'), genBtn = $('genBtn'), resultBox = $('resultBox');
+  var promptEl = $('prompt'), genBtn = $('genBtn'), resultBox = $('resultBox'), transNote = $('transNote');
   var keyDot = $('keyDot'), keyStatus = $('keyStatus'), toastEl = $('toast');
   var startOAuthBtn = $('startOAuth');
   var connectedBox = $('connectedBox'), connAvatar = $('connAvatar'), connName = $('connName'), connSub = $('connSub');
@@ -643,6 +649,41 @@
     showLoginModal();
   }
 
+  // ---------------- IP 检测 + 中英转换 ----------------
+  var detectPromise = null, userCountry = '', translated = false, finalPrompt = promptEl.value;
+  function detectCountry() {
+    if (detectPromise) return detectPromise;
+    var p = fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
+      .then(function (r) { if (!r.ok) throw new Error('ipapi ' + r.status); return r.json(); })
+      .then(function (d) {
+        userCountry = (d && d.country_name) ? (d.country_name + (d.city ? '（' + d.city + '）' : '')) : '';
+        return userCountry;
+      })
+      .catch(function () { userCountry = ''; return userCountry; });
+    detectPromise = p;
+    return p;
+  }
+  function hasCJK(s) { return /[\u4e00-\u9fff\u3400-\u4dbf]/.test(s || ''); }
+  // 用 Pollinations 官方【免费】文本接口翻译，不消耗用户 Pollen 额度；不可用时回退原文
+  function translatePrompt(prompt) {
+    var hint = 'Translate the following image prompt into natural English for an AI image generator. Keep proper nouns, numbers and any already-English terms. Output ONLY the English translation, no quotes, no extra words.';
+    var url = 'https://text.pollinations.ai/openai' +
+      '?model=openai' +
+      '&system=' + encodeURIComponent(hint) +
+      '&messages=' + encodeURIComponent(prompt) +
+      '&json=false&private=true&referrer=wobuddy-local';
+    return fetch(url, { signal: AbortSignal.timeout(8000) })
+      .then(function (r) {
+        if (!r.ok) throw new Error('text.pollinations ' + r.status);
+        return r.text();
+      })
+      .then(function (txt) {
+        var t = (txt || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '').trim();
+        if (!t || !/[\x20-\x7e]/.test(t)) throw new Error('翻译结果为空');
+        return t;
+      });
+  }
+
   // ---------------- 生成 ----------------
   function currentModel() {
     if (state.model === 'custom') return state.customModel || '';
@@ -661,23 +702,26 @@
 
     state.generating = true;
     genBtn.disabled = true;
-    genBtn.textContent = '生成中，请稍候…';
+    genBtn.textContent = '智能转换中…';
 
-    renderLoading();
-    fetch(API_BASE + '/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + key,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        prompt: prompt,
-        model: model,
-        size: state.size,
-        n: 1,
-        response_format: 'b64_json'
+    // 根据 IP 自动中英转换（国内 IP + 含中文 -> 翻译成英文；其余原样保留）
+    var doGenerate = function (finalPrompt) {
+      genBtn.textContent = '生成中，请稍候…';
+      renderLoading();
+      fetch(API_BASE + '/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + key,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: finalPrompt,
+          model: model,
+          size: state.size,
+          n: 1,
+          response_format: 'b64_json'
+        })
       })
-    })
     .then(function (res) {
       if (!res.ok) {
         return res.json().catch(function () { return {}; }).then(function (err) {
@@ -708,6 +752,24 @@
     });
   }
 
+  // 流程：IP 检测 -> 免费中英转换（国内 + 含中文才翻译）-> 生成
+  detectCountry().then(function (country) {
+    var cn = /China|中国/.test(country || '');
+    if (cn && hasCJK(prompt)) {
+      return translatePrompt(prompt)
+        .then(function (en) { translated = true; finalPrompt = en; return en; })
+        .catch(function () { translated = false; finalPrompt = prompt; return prompt; });
+    }
+    translated = false; finalPrompt = prompt; return prompt;
+  }).then(function (finalP) {
+    if (transNote) {
+      if (translated) { transNote.textContent = '已自动译英'; transNote.style.display = ''; }
+      else { transNote.style.display = 'none'; }
+    }
+    doGenerate(finalP);
+  });
+  }
+
   function mimeFromB64(b64) {
     if (b64.indexOf('iVBOR') === 0) return 'image/png';
     if (b64.indexOf('/9j/') === 0) return 'image/jpeg';
@@ -734,7 +796,9 @@
         '<button class="btn btn-primary btn-sm" id="dlBtn">下载图片</button>' +
         '<button class="btn btn-soft btn-sm" id="regenBtn">换一张</button>' +
       '</div>' +
-      '<div class="img-meta">尺寸 ' + state.size + ' · ' + ext.toUpperCase() + ' · 生成于 ' + now.toLocaleTimeString() + '<br>提示词：' + escapeHtml(prompt) + '</div>';
+      '<div class="img-meta">尺寸 ' + state.size + ' · ' + ext.toUpperCase() + ' · 生成于 ' + now.toLocaleTimeString() +
+      (translated ? '<br><span style="color:#5cc9a3;font-weight:700">已自动译成英文（基于所在地区）</span><br>原文：' + escapeHtml(prompt) + '<br>译文：' + escapeHtml(finalPrompt) : '<br>提示词：' + escapeHtml(prompt)) +
+      '</div>';
 
     $('dlBtn').addEventListener('click', function () {
       var a = document.createElement('a');
