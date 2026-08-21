@@ -33,24 +33,31 @@
   }
   .wrap { max-width: 1080px; margin: 0 auto; }
 
-  /* ---------- 顶部 ---------- */
-  header { text-align: center; margin-bottom: 26px; }
-  .logo-row { display: inline-flex; align-items: center; gap: 12px; }
+  /* ---------- 顶部栏（LOGO 左 / 登录框 右） ---------- */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
+  .logo-row { display: flex; align-items: center; gap: 12px; }
   .logo-badge {
     width: 52px; height: 52px; border-radius: 16px;
     background: linear-gradient(135deg, var(--pink) 0%, var(--lavender-deep) 100%);
     display: flex; align-items: center; justify-content: center;
     box-shadow: var(--shadow);
   }
-  header h1 {
+  .logo-text h1 {
     font-size: 30px; color: #fff;
     letter-spacing: 2px; font-weight: 700;
     text-shadow: 0 2px 10px rgba(0,0,0,.35);
   }
-  header .sub { color: #d9c8de; font-size: 13px; margin-top: 8px; letter-spacing: 1px; }
+  .logo-text .sub { color: #d9c8de; font-size: 13px; margin-top: 8px; letter-spacing: 1px; }
+  .topbar-login { flex: 0 0 auto; max-width: 380px; min-width: 240px; }
+  .topbar-login .byop-primary { margin: 0; }
+  .topbar-login .connected { margin-top: 0; }
+  @media (max-width: 720px) {
+    .topbar { flex-direction: column; align-items: stretch; }
+    .topbar-login { max-width: none; width: 100%; }
+  }
 
-  /* ---------- 布局 ---------- */
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+  /* ---------- 布局（左右 1:3） ---------- */
+  .grid { display: grid; grid-template-columns: 1fr 3fr; gap: 22px; align-items: start; }
   @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
 
   .card {
@@ -234,7 +241,7 @@
 
 <div class="wrap">
 
-  <header>
+  <header class="topbar">
     <div class="logo-row">
       <div class="logo-badge">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
@@ -245,58 +252,40 @@
           <rect x="6.5" y="18" width="11" height="2.4" rx="1.2" fill="#fff" opacity=".7"/>
         </svg>
       </div>
-      <h1>Pollen 生图工坊</h1>
+      <div class="logo-text">
+        <h1>Pollen 生图工坊</h1>
+        <div class="sub">基于 Pollinations AI 官方 BYOP 授权流程 · 用你自己的 Pollen 额度生成图片</div>
+      </div>
     </div>
-    <div class="sub">基于 Pollinations AI 官方 BYOP 授权流程 · 用你自己的 Pollen 额度生成图片</div>
+
+    <div class="topbar-login">
+      <div class="byop-primary">
+        <button class="btn btn-primary" id="startOAuth" type="button">授权并连接</button>
+
+        <!-- 已连接状态 -->
+        <div class="connected" id="connectedBox" style="display:none;">
+          <img id="connAvatar" alt="">
+          <div>
+            <div class="conn-name" id="connName"></div>
+            <div class="conn-sub" id="connSub"></div>
+          </div>
+          <button class="btn btn-soft btn-sm" id="disconnectBtn" type="button">退出连接</button>
+        </div>
+        <div class="hint" id="oauthHint"></div>
+
+        <!-- 授权流程所需参数（回调地址/有效期/额度），已写死在代码中，不展示给用户 -->
+        <input type="hidden" id="pkExpiry" value="7">
+        <input type="hidden" id="pkBudget">
+      </div>
+    </div>
   </header>
 
   <div class="grid">
 
-    <!-- ============ 左：配置 ============ -->
+    <!-- ============ 左：创作（窄栏，比例 1） ============ -->
     <div>
-      <!-- 连接 -->
       <div class="card">
-        <h2><span class="dot dot-pink"></span>一、连接你的 Pollen 账户</h2>
-
-        <div class="byop-primary">
-          <button class="btn btn-primary btn-block" id="startOAuth" type="button">授权并连接</button>
-
-          <!-- 已连接状态 -->
-          <div class="connected" id="connectedBox" style="display:none;">
-            <img id="connAvatar" alt="">
-            <div>
-              <div class="conn-name" id="connName"></div>
-              <div class="conn-sub" id="connSub"></div>
-            </div>
-            <button class="btn btn-soft btn-sm" id="disconnectBtn" type="button">退出连接</button>
-          </div>
-          <div class="hint" id="oauthHint"></div>
-
-          <!-- 授权流程所需参数（回调地址/有效期/额度），已写死在代码中，不展示给用户 -->
-          <input type="hidden" id="pkExpiry" value="7">
-          <input type="hidden" id="pkBudget">
-        </div>
-
-        <details class="byop" style="display:none">
-          <summary>或：直接粘贴 sk_ 密钥（仅开发 / 自用，非官方推荐）</summary>
-          <div class="body">
-            <label for="apiKey">API Key（sk_ 开头）</label>
-            <div class="key-row">
-              <input type="password" id="apiKey" placeholder="粘贴 sk_ 密钥，仅存本机浏览器" autocomplete="off">
-              <button class="btn btn-soft btn-sm" id="toggleKey" type="button">显示</button>
-            </div>
-            <div class="status-bar">
-              <span class="status-dot st-idle" id="keyDot"></span>
-              <span class="st-text" id="keyStatus">未填写。</span>
-            </div>
-            <div class="hint">前端直接放 sk_ 主密钥不安全，生产环境请改用上面的官方 BYOP 授权。</div>
-          </div>
-        </details>
-      </div>
-
-      <!-- 创作 -->
-      <div class="card">
-        <h2><span class="dot dot-mint"></span>二、写下你的画面</h2>
+        <h2><span class="dot dot-mint"></span>写下你的画面</h2>
         <label for="prompt">提示词（英文效果更佳，支持中文）</label>
         <textarea id="prompt" placeholder="例如：a cute pastel-colored cartoon cat with big eyes, soft lighting, dreamy atmosphere"></textarea>
         <div class="ex-row">
@@ -316,9 +305,25 @@
 
         <button class="btn btn-primary btn-block" id="genBtn" type="button">生成图片</button>
       </div>
+
+      <details class="byop" style="display:none">
+        <summary>或：直接粘贴 sk_ 密钥（仅开发 / 自用，非官方推荐）</summary>
+        <div class="body">
+          <label for="apiKey">API Key（sk_ 开头）</label>
+          <div class="key-row">
+            <input type="password" id="apiKey" placeholder="粘贴 sk_ 密钥，仅存本机浏览器" autocomplete="off">
+            <button class="btn btn-soft btn-sm" id="toggleKey" type="button">显示</button>
+          </div>
+          <div class="status-bar">
+            <span class="status-dot st-idle" id="keyDot"></span>
+            <span class="st-text" id="keyStatus">未填写。</span>
+          </div>
+          <div class="hint">前端直接放 sk_ 主密钥不安全，生产环境请改用上面的官方 BYOP 授权。</div>
+        </div>
+      </details>
     </div>
 
-    <!-- ============ 右：结果 ============ -->
+    <!-- ============ 右：结果（宽栏，比例 3） ============ -->
     <div class="card result-area">
       <h2><span class="dot dot-lav"></span>生成结果</h2>
       <div id="resultBox"></div>
