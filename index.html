@@ -153,12 +153,15 @@
 
   .size-row { display: flex; flex-wrap: wrap; gap: 8px; }
   .size-chip {
-    padding: 8px 14px; border-radius: 999px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 7px 14px; border-radius: 16px; cursor: pointer;
     border: 2px solid #eee0ea; background: var(--white);
-    font-size: 13px; color: var(--ink-soft); font-weight: 600;
     transition: all .2s;
   }
-  .size-chip.selected { background: var(--mint); border-color: var(--mint-deep); color: #2e6b52; }
+  .size-chip .size-dim { font-size: 13px; color: var(--ink); font-weight: 700; line-height: 1.2; }
+  .size-chip .size-ratio { font-size: 11px; color: var(--ink-soft); font-weight: 600; line-height: 1.2; }
+  .size-chip.selected { background: var(--mint); border-color: var(--mint-deep); }
+  .size-chip.selected .size-dim, .size-chip.selected .size-ratio { color: #2e6b52; }
 
   /* ---------- 示例 ---------- */
   .ex-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -452,12 +455,28 @@
     });
   }
 
+  function sizeRatio(s) {
+    var p = s.split('x'); var w = +p[0], h = +p[1];
+    function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+    var g = gcd(w, h);
+    var rw = w / g, rh = h / g;
+    var orient = (w === h) ? '正方' : (h > w ? '竖图' : '横图');
+    return rw + ':' + rh + ' ' + orient;
+  }
+
   function buildSizeRow() {
     var row = $('sizeRow');
     SIZES.forEach(function (s) {
       var chip = document.createElement('span');
       chip.className = 'size-chip' + (s === state.size ? ' selected' : '');
-      chip.textContent = s;
+      var dim = document.createElement('span');
+      dim.className = 'size-dim';
+      dim.textContent = s;
+      var r = document.createElement('span');
+      r.className = 'size-ratio';
+      r.textContent = sizeRatio(s);
+      chip.appendChild(dim);
+      chip.appendChild(r);
       chip.addEventListener('click', function () {
         document.querySelectorAll('.size-chip').forEach(function (x) { x.classList.remove('selected'); });
         chip.classList.add('selected');
