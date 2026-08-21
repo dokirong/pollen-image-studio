@@ -302,6 +302,11 @@
   }
   .modal-title { font-size: 21px; color: var(--ink); font-weight: 800; margin-bottom: 10px; }
   .modal-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.7; margin-bottom: 22px; }
+  .modal-region {
+    display: inline-block; margin: 0 auto 14px; font-size: 12px; font-weight: 800;
+    color: var(--lavender-deep); background: #ece4fb; border: 1px dashed var(--lavender-deep);
+    padding: 4px 12px; border-radius: 999px;
+  }
 </style>
 </head>
 <body>
@@ -408,6 +413,7 @@
         <rect x="7" y="17.5" width="10" height="2.2" rx="1.1" fill="#fff" opacity=".7"/>
       </svg>
     </div>
+    <div class="modal-region" id="modalRegion">…</div>
     <h3 class="modal-title">登录以开始创作</h3>
     <p class="modal-desc">使用你的 Pollinations 账户完成官方 BYOP 授权，即可用你自己的 Pollen 额度生成图片。限权密钥仅保存在本次会话，可随时在后台撤销。</p>
     <button class="btn btn-primary btn-block" id="startOAuth" type="button">授权并连接</button>
@@ -544,8 +550,8 @@
       oauthOk: 'Connected. Generation uses your authorized scoped key (valid for this session).'
     }
   };
-  // 语言：同步判定浏览器语言（非中文 -> 英文），IP 检测仅作二次兜底；手动切换仅当前会话生效
-  var uiLang = (function () { var l = (navigator.language || '').toLowerCase(); return (/^zh/.test(l) ? 'zh' : 'en'); })();
+  // 语言：默认英文；IP为中国才切中文，IP强制一切（含覆盖手动切换）
+  var uiLang = 'en';
   function t(key) { return (I18N[uiLang] && I18N[uiLang][key]) || key; }
   function applyLang() {
     var L = I18N[uiLang];
@@ -609,21 +615,20 @@
       promptEl.focus();
     });
 
-    // 语言切换（仅当前会话生效；随后 IP 兜底不覆盖手动切换）
-    var userToggled = false;
+    // 语言切换：手动切换立即生效，但之后 IP 结果到达时强制按 IP 覆盖
     $('langBtn').addEventListener('click', function () {
       uiLang = uiLang === 'zh' ? 'en' : 'zh';
-      userToggled = true;
-      localStorage.setItem('pollen_lang_sess', uiLang);  // 会话内记住，避免 IP 覆盖
       applyLang();
     });
 
-    // IP 兜底校正：仅当用户未手动切换时，才按 IP 修正默认语言
+    // IP 强制一切：默认英文；IP 为中国才切中文；结果写入登录模态框地区行
     detectCountry().then(function (country) {
-      if (userToggled) return;
       var cn = /China|中国/.test(country || '');
-      var desired = cn ? 'zh' : 'en';
-      if (desired !== uiLang) { uiLang = desired; applyLang(); }
+      var region = country || (cn ? 'China' : '');
+      var mr = $('modalRegion');
+      if (mr) mr.textContent = 'IP Region: ' + (region || (cn ? 'China' : 'Unknown'));
+      uiLang = cn ? 'zh' : 'en';
+      applyLang();
     });
     applyLang();
 
