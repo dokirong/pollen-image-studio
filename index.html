@@ -552,6 +552,7 @@
   };
   // 语言：默认英文；IP为中国才切中文，IP强制一切（含覆盖手动切换）
   var uiLang = 'en';
+  var uiRegion = '';
   function t(key) { return (I18N[uiLang] && I18N[uiLang][key]) || key; }
   function applyLang() {
     var L = I18N[uiLang];
@@ -560,6 +561,8 @@
     if (genBtn) { if (!state.generating) genBtn.textContent = L.btnGen; else genBtn.textContent = L.btnGenBusy; }
     if ($('sizeLabelEl')) $('sizeLabelEl').textContent = L.sizeLabel;
     if ($('modelLabelEl')) $('modelLabelEl').textContent = L.modelLabel;
+    var mr = $('modalRegion');
+    if (mr && uiRegion) mr.textContent = (uiLang === 'zh' ? 'IP 地区：' : 'IP Region: ') + uiRegion;
     if ($('modalTitle')) $('modalTitle').textContent = L.modalTitle;
     if ($('modalDesc')) $('modalDesc').textContent = L.modalDesc;
     if (startOAuthBtn) startOAuthBtn.textContent = L.btnOAuth;
@@ -624,11 +627,9 @@
     // IP 强制一切：默认英文；IP 为中国才切中文；结果写入登录模态框地区行
     detectCountry().then(function (country) {
       var cn = /China|中国/.test(country || '');
-      var region = country || (cn ? 'China' : '');
-      var mr = $('modalRegion');
-      if (mr) mr.textContent = 'IP Region: ' + (region || (cn ? 'China' : 'Unknown'));
+      uiRegion = country || (cn ? 'China' : 'Unknown');
       uiLang = cn ? 'zh' : 'en';
-      applyLang();
+      applyLang();  // applyLang 内会按当前语言渲染 IP 地区行
     });
     applyLang();
 
