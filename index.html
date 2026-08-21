@@ -269,9 +269,7 @@
           </div>
           <div class="hint" id="oauthHint"></div>
 
-          <!-- 授权流程所需参数，已内置默认值，不展示给用户 -->
-          <input type="hidden" id="redirectUri">
-          <button class="btn btn-soft btn-sm" id="copyUri" type="button" style="display:none">复制</button>
+          <!-- 授权流程所需参数（回调地址/有效期/额度），已写死在代码中，不展示给用户 -->
           <input type="hidden" id="pkExpiry" value="7">
           <input type="hidden" id="pkBudget">
         </div>
@@ -378,17 +376,15 @@
   var pkExpiryEl = $('pkExpiry'), pkBudgetEl = $('pkBudget');
   var promptEl = $('prompt'), genBtn = $('genBtn'), resultBox = $('resultBox');
   var keyDot = $('keyDot'), keyStatus = $('keyStatus'), toastEl = $('toast');
-  var startOAuthBtn = $('startOAuth'), redirectUriEl = $('redirectUri'), copyUriBtn = $('copyUri');
+  var startOAuthBtn = $('startOAuth');
   var connectedBox = $('connectedBox'), connAvatar = $('connAvatar'), connName = $('connName'), connSub = $('connSub');
   var disconnectBtn = $('disconnectBtn'), oauthHint = $('oauthHint');
 
-  // 始终一致的回调地址：origin + pathname（不含 query/hash），必须和 App Key 里登记的完全一致
-  var REDIRECT_URI = location.origin + location.pathname;
+  // 固定的回调地址（与 App Key 登记的 Redirect URI 完全一致，写死避免本地/线上计算不一致）
+  var REDIRECT_URI = 'https://dokirong.github.io/pollen-image-studio/';
 
   // ---------------- 初始化 ----------------
   function init() {
-    redirectUriEl.value = REDIRECT_URI;
-
     var scoped = sessionStorage.getItem(SCOPED_STORE);
     if (scoped) {
       var ui = safeParse(sessionStorage.getItem(USERINFO_STORE));
@@ -408,12 +404,6 @@
     apiKeyEl.addEventListener('change', saveKey);
     apiKeyEl.addEventListener('input', function () { setKeyState(false); });
     startOAuthBtn.addEventListener('click', startOAuth);
-    copyUriBtn.addEventListener('click', function () {
-      redirectUriEl.select();
-      try { document.execCommand('copy'); } catch (e) {}
-      if (navigator.clipboard) navigator.clipboard.writeText(REDIRECT_URI).catch(function(){});
-      toast('回调地址已复制');
-    });
     disconnectBtn.addEventListener('click', disconnect);
 
     document.querySelectorAll('.ex-chip').forEach(function (el) {
