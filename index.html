@@ -169,7 +169,7 @@
     padding: 6px 10px; cursor: pointer; transition: all .2s;
     font-size: 12px; font-weight: 700; color: var(--lavender-deep);
     display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.2;
-    flex: 1 1 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   /* 悬停：卡片自动扩宽，完整名称浮出 */
   .ref-card:hover { background: #fbe9f2; border-color: var(--pink); color: var(--pink-deep); flex-grow: 2.2; z-index: 2; }
@@ -641,6 +641,7 @@
 
   function buildSizeRow() {
     var row = $('sizeRow');
+    row.innerHTML = '';
     SIZES.forEach(function (s) {
       var chip = document.createElement('span');
       chip.className = 'size-chip' + (s === state.size ? ' selected' : '');
@@ -665,6 +666,7 @@
 
   function buildRefGrid() {
     var g = $('refGrid');
+    g.innerHTML = '';
     REF_PROMPTS.forEach(function (it) {
       var c = document.createElement('div');
       c.className = 'ref-card';
