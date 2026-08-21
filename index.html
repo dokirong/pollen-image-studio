@@ -545,7 +545,13 @@
       oauthOk: 'Connected. Generation uses your authorized scoped key (valid for this session).'
     }
   };
-  var uiLang = localStorage.getItem(LANG_STORE) === 'en' ? 'en' : 'zh';
+  // 默认语言：用户手动选过则记住；否则按访问者 IP 所属地区（中国=zh，其他=en）
+  var uiLang = localStorage.getItem(LANG_STORE) === 'en' ? 'en' : localStorage.getItem(LANG_STORE) === 'zh' ? 'zh' : (function () {
+    try {
+      // 未手动选过：先默认中文，随后由 IP 检测决定（见 init 的 detectCountry 逻辑）
+      return 'zh';
+    } catch (e) { return 'zh'; }
+  })();
   function t(key) { return (I18N[uiLang] && I18N[uiLang][key]) || key; }
   function applyLang() {
     var L = I18N[uiLang];
@@ -615,6 +621,15 @@
       localStorage.setItem(LANG_STORE, uiLang);
       applyLang();
     });
+
+    // 首次访问（未手动选过语言）：按访问者 IP 决定默认界面语言
+    if (!localStorage.getItem(LANG_STORE)) {
+      detectCountry().then(function (country) {
+        var cn = /China|中国/.test(country || '');
+        uiLang = cn ? 'zh' : 'en';
+        applyLang();  // 重新应用语言（含模型/尺寸/参考卡重建）
+      });
+    }
     applyLang();
 
     // 未连接且不是 OAuth 回调页 -> 载入即弹出登录模态框
