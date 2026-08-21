@@ -318,8 +318,8 @@
         </svg>
       </div>
       <div class="logo-text">
-        <h1>Pollen 生图工坊</h1>
-        <div class="sub">基于 Pollinations AI 官方 BYOP 授权流程 · 用你自己的 Pollen 额度生成图片</div>
+        <h1 id="appTitle">Pollen 生图工坊</h1>
+        <div class="sub" id="appSub">基于 Pollinations AI 官方 BYOP 授权流程 · 用你自己的 Pollen 额度生成图片</div>
       </div>
     </div>
 
@@ -359,15 +359,15 @@
 
         <label id="sizeLabelEl">尺寸</label>
         <div class="size-row" id="sizeRow"></div>
-        <div class="hint">模型支持 256x256 ~ 2048x2048，超大尺寸可能被模型限制或耗时更长。</div>
+        <div class="hint" id="sizeHint">模型支持 256x256 ~ 2048x2048，超大尺寸可能被模型限制或耗时更长。</div>
 
         <button class="btn btn-primary btn-block" id="genBtn" type="button">生成图片</button>
       </div>
 
       <details class="byop" style="display:none">
-        <summary>或：直接粘贴 sk_ 密钥（仅开发 / 自用，非官方推荐）</summary>
+        <summary id="byopSummary">或：直接粘贴 sk_ 密钥（仅开发 / 自用，非官方推荐）</summary>
         <div class="body">
-          <label for="apiKey">API Key（sk_ 开头）</label>
+          <label for="apiKey" id="apiKeyLabel">API Key（sk_ 开头）</label>
           <div class="key-row">
             <input type="password" id="apiKey" placeholder="粘贴 sk_ 密钥，仅存本机浏览器" autocomplete="off">
             <button class="btn btn-soft btn-sm" id="toggleKey" type="button">显示</button>
@@ -376,7 +376,7 @@
             <span class="status-dot st-idle" id="keyDot"></span>
             <span class="st-text" id="keyStatus">未填写。</span>
           </div>
-          <div class="hint">前端直接放 sk_ 主密钥不安全，生产环境请改用上面的官方 BYOP 授权。</div>
+          <div class="hint" id="byopHint">前端直接放 sk_ 主密钥不安全，生产环境请改用上面的官方 BYOP 授权。</div>
         </div>
       </details>
     </div>
@@ -390,9 +390,7 @@
   </div>
 
   <footer>
-    参照 <a href="https://github.com/pollinations/pollinations/blob/main/BRING_YOUR_OWN_POLLEN.md" target="_blank" rel="noopener">Pollinations BYOP 官方规则</a>
-    构建 · 接口 POST https://gen.pollinations.ai/v1/images/generations
-    <br>图片由 AI 生成，请注意内容合规。如遇 429/503，请稍后重试。
+    Powered by <a href="https://pollinations.ai" target="_blank" rel="noopener">Pollinations</a>
   </footer>
 </div>
 
@@ -449,12 +447,28 @@
   ];
 
   var REF_PROMPTS = [
-    { key: 'refMath',   fullKey: 'refMathF',   p: '高中二年级数学全部知识信息图' },
-    { key: 'refDev',    fullKey: 'refDevF',    p: '游戏开发策划运营信息图' },
-    { key: 'refWuxia',  fullKey: 'refWuxiaF',  p: '满脸沧桑的游侠，目光锐利，凌乱发丝，横着剑身金粉弥散，暗黑风格，构图采用黄金分割，强化人物情感，负空间策略性地烘托侠客的孤独与坚定。电影级高分辨率、大师级摄影、超现实细节、顶级影视海报美术平面设计艺术感' },
-    { key: 'refFengtian', fullKey: 'refFengtianF', p: '电影海报，大师排版，顶级设计，金箔材质的书法字"我欲封天"位于图片下方三分之一处，字体奔放，笔画飘逸飞白，墨色对比强烈，笔势细腻，字形结构夸张变形呈现张力，参考以下细节：笔法：逆锋起笔/横扫收笔，中锋侧锋交替节奏：快慢交替章法：字间大小悬殊（最大字是最小字的3倍）。英文小字"WOYUFENGTIAN"，红色小篆印章"耳根 著"。白衣仙人，腾空姿态，背对镜头，疯狂长散发与仙气长衣往镜头飞扬遮挡，动态张力，仰视视角，主体（仙人）居下+巨兽（黑龙）居上，腾空与仙门蜀山山巅与天空仰视黑龙，冷色调（灰蓝黑主色，绿棕副色调），低饱和暗调，逆强光氛围，光束穿透感，局部高光（剑刃/龙鳞），东方玄幻，震撼临场感，史诗场景' },
-    { key: 'refDao',    fullKey: 'refDaoF',    p: '奇幻写实风格，神明世界里狂风呼啸，空间扭曲变形，巨手带着强大的气势降临，各样有形的气流顺着人物面对的方向汹涌而去，巨大压力下努力维持蓄势挥刀姿态，散发着丝丝杀意，风卷着残叶，仿佛要将面前的一切都摧毁，画面采用侧视角，以冷色调为主，增强画面的冲击力。动态模糊强化携带速度线残影，超广角强透视构图，动态模糊边缘虚化，强烈胶片颗粒与高噪点质感，弥散晕染的暗部层次，张力十足，压迫感，细节生动完美。威胁压迫感，极其震撼的一幕，光影彼此交织错杂的梦幻感，朦胧，过曝，双重曝光，电影级构图，视觉冲击，8K画质，超清，极致细节，极致刻画，清晰的线条，高对比。对命运的不公。' },
-    { key: 'refArray',  fullKey: 'refArrayF',  p: '尖锐特写，无限细节。极繁主义，色彩鲜明，立体感十足，光影艺术，空间纵深感 超现实玄幻仙侠，酸性美学，低角度对角倾斜仰视过肩镜头，画面底部角落一名全身丝绸白衣的白色长发男修士背对镜举发光仙剑剑指阵法，地面幻化一道道巨大且虚幻的黑金岩浆光环，四处飘动各种黑金粒子和无数条印有经文的金色透明光带，黑金能量束穿透黑暗能量层，曜变釉面反射多重曝光光斑。混沌交织的虚空中云雾笼罩且金光闪耀，金色粒子汇聚成金色半透明的法阵漩涡，漩涡四周边界融化于云层中，数以万计的外形似剑的金光和金色经文极速下落，CG渲染，全身，巨大比例，C4D，Blender，虚幻引擎，Octane渲染器，全局光照，光线追踪反射，屏幕空间环境光遮蔽，着色器，快速近似抗锯齿，计算机生成图像，RTX，视觉特效，4K 分辨率，最佳画质，极致细节，超写实，暗黑风格，昏暗，梦幻，史诗，压迫感，能见度极低，大量阴影和留白，极具视觉冲击的压迫感的构图，低饱和度，低亮度，巨物恐惧，故事感，高级感，动态感' }
+    { key: 'refMath',   fullKey: 'refMathF',   p: '高中二年级数学全部知识信息图', pe: 'a comprehensive infographic of all senior-high-grade-2 mathematics knowledge' },
+    { key: 'refDev',    fullKey: 'refDevF',    p: '游戏开发策划运营信息图', pe: 'an infographic of game development, planning and operations' },
+    {
+      key: 'refWuxia', fullKey: 'refWuxiaF',
+      p: '满脸沧桑的游侠，目光锐利，凌乱发丝，横着剑身金粉弥散，暗黑风格，构图采用黄金分割，强化人物情感，负空间策略性地烘托侠客的孤独与坚定。电影级高分辨率、大师级摄影、超现实细节、顶级影视海报美术平面设计艺术感',
+      pe: 'a weathered wandering swordsman, sharp piercing eyes, disheveled strands of hair, holding his sword horizontally as golden dust scatters from the blade, dark style, golden-ratio composition, heightened emotional expression, negative space strategically emphasizing the ranger\'s loneliness and resolve, cinematic high resolution, masterful photography, hyper-realistic detail, top-tier movie poster graphic design artistry'
+    },
+    {
+      key: 'refFengtian', fullKey: 'refFengtianF',
+      p: '电影海报，大师排版，顶级设计，金箔材质的书法字"我欲封天"位于图片下方三分之一处，字体奔放，笔画飘逸飞白，墨色对比强烈，笔势细腻，字形结构夸张变形呈现张力，参考以下细节：笔法：逆锋起笔/横扫收笔，中锋侧锋交替节奏：快慢交替章法：字间大小悬殊（最大字是最小字的3倍）。英文小字"WOYUFENGTIAN"，红色小篆印章"耳根 著"。白衣仙人，腾空姿态，背对镜头，疯狂长散发与仙气长衣往镜头飞扬遮挡，动态张力，仰视视角，主体（仙人）居下+巨兽（黑龙）居上，腾空与仙门蜀山山巅与天空仰视黑龙，冷色调（灰蓝黑主色，绿棕副色调），低饱和暗调，逆强光氛围，光束穿透感，局部高光（剑刃/龙鳞），东方玄幻，震撼临场感，史诗场景',
+      pe: 'movie poster, master typography, top-tier design, gold-foil calligraphy characters "WO YU FENG TIAN" at the lower third of the image, bold flowing strokes with flying-white brush texture, strong ink contrast, delicate brushwork, exaggerated distorted character shapes full of tension, brush technique: reverse-edge start and sweeping end, alternating center and side brush; rhythm alternating fast and slow; layout with extreme size contrast between characters (largest three times the smallest), small English text "WOYUFENGTIAN", red small-seal stamp "Er Gen". A white-robed immortal in mid-air leaping pose, back to camera, wildly long hair and immortal robes flying toward the lens, dynamic tension, low-angle view, immortal figure at bottom and giant black dragon at top, mountain peaks of the immortal sect in the background, cold palette (gray-blue-black primary, green-brown secondary), low-saturation dark tones, backlit strong-light atmosphere, penetrating light beams, selective highlights on sword edge and dragon scales, eastern xianxia fantasy, overwhelming presence, epic scene'
+    },
+    {
+      key: 'refDao', fullKey: 'refDaoF',
+      p: '奇幻写实风格，神明世界里狂风呼啸，空间扭曲变形，巨手带着强大的气势降临，各样有形的气流顺着人物面对的方向汹涌而去，巨大压力下努力维持蓄势挥刀姿态，散发着丝丝杀意，风卷着残叶，仿佛要将面前的一切都摧毁，画面采用侧视角，以冷色调为主，增强画面的冲击力。动态模糊强化携带速度线残影，超广角强透视构图，动态模糊边缘虚化，强烈胶片颗粒与高噪点质感，弥散晕染的暗部层次，张力十足，压迫感，细节生动完美。威胁压迫感，极其震撼的一幕，光影彼此交织错杂的梦幻感，朦胧，过曝，双重曝光，电影级构图，视觉冲击，8K画质，超清，极致细节，极致刻画，清晰的线条，高对比。对命运的不公。',
+      pe: 'fantasy realism, a divine world with roaring winds and warping space, a giant hand descending with overwhelming presence, visible air currents surging toward the figure, struggling to hold a sword-drawing stance under immense pressure, faint killing intent, wind whipping fallen leaves, as if about to destroy everything ahead, side view, cold color palette for impact, motion blur with speed-line afterimages, ultra-wide-angle strong-perspective composition, blurred edges from motion blur, heavy film grain and high-noise texture, diffused blending in the shadows, full of tension and oppression, vivid perfect detail, threatening and extremely shocking scene, dreamlike interweaving light and shadow, hazy, overexposed, double exposure, cinematic composition, visual impact, 8K quality, ultra clear, extreme detail, extreme rendering, crisp lines, high contrast, defiance of an unjust fate'
+    },
+    {
+      key: 'refArray', fullKey: 'refArrayF',
+      p: '尖锐特写，无限细节。极繁主义，色彩鲜明，立体感十足，光影艺术，空间纵深感 超现实玄幻仙侠，酸性美学，低角度对角倾斜仰视过肩镜头，画面底部角落一名全身丝绸白衣的白色长发男修士背对镜举发光仙剑剑指阵法，地面幻化一道道巨大且虚幻的黑金岩浆光环，四处飘动各种黑金粒子和无数条印有经文的金色透明光带，黑金能量束穿透黑暗能量层，曜变釉面反射多重曝光光斑。混沌交织的虚空中云雾笼罩且金光闪耀，金色粒子汇聚成金色半透明的法阵漩涡，漩涡四周边界融化于云层中，数以万计的外形似剑的金光和金色经文极速下落，CG渲染，全身，巨大比例，C4D，Blender，虚幻引擎，Octane渲染器，全局光照，光线追踪反射，屏幕空间环境光遮蔽，着色器，快速近似抗锯齿，计算机生成图像，RTX，视觉特效，4K 分辨率，最佳画质，极致细节，超写实，暗黑风格，昏暗，梦幻，史诗，压迫感，能见度极低，大量阴影和留白，极具视觉冲击的压迫感的构图，低饱和度，低亮度，巨物恐惧，故事感，高级感，动态感',
+      pe: 'sharp close-up, infinite detail, maximalism, vivid colors, strong dimensionality, light-and-shadow art, deep spatial perspective, surreal xianxia fantasy, acid aesthetics, low-angle tilted over-shoulder shot, at the bottom corner a male cultivator in flowing white silk robes with long white hair, back to camera, raising a glowing immortal sword toward a formation, colossal unreal black-gold magma rings manifesting on the ground, black-gold particles drifting everywhere with countless golden translucent ribbons inscribed with scriptures, black-gold energy beams piercing the dark energy layers, yohen-tenmoku glaze reflections with multiple-exposure bokeh, chaotic void with mist and blazing golden light, golden particles converging into a translucent golden formation vortex whose edges melt into the clouds, tens of thousands of sword-shaped beams of golden light and golden scriptures raining down, CG render, full body, huge scale, C4D, Blender, Unreal Engine, Octane, global illumination, ray-traced reflections, screen-space ambient occlusion, shaders, FXAA, CGI, RTX, VFX, 4K resolution, best quality, extreme detail, hyper-realistic, dark style, dim, dreamy, epic, oppressive, extremely low visibility, heavy shadows and negative space, visually crushing composition, low saturation, low brightness, megalophobia, story-driven, premium feel, dynamic'
+    }
   ];
 
   var SIZES = ['512x512', '768x768', '1024x1024', '768x1024', '1024x768', '512x768', '768x512', '1536x1024', '1024x576', '1536x864', '576x1024', '864x1536'];
@@ -496,7 +510,12 @@
       orientSquare: '正方', orientPortrait: '竖图', orientLandscape: '横图',
       randomBtn: '随机看看', show: '显示', hide: '隐藏',
       refMath: '数学信息图', refDev: '开发信息图', refWuxia: '美术武侠图', refFengtian: '我欲封天', refDao: '神明挥刀', refArray: '白衣法阵',
-      refMathF: '数学信息图', refDevF: '开发信息图', refWuxiaF: '美术武侠图', refFengtianF: '我欲封天海报', refDaoF: '神明挥刀图', refArrayF: '白衣法阵图'
+      refMathF: '数学信息图', refDevF: '开发信息图', refWuxiaF: '美术武侠图', refFengtianF: '我欲封天海报', refDaoF: '神明挥刀图', refArrayF: '白衣法阵图',
+      appTitle: 'Pollen 生图工坊', appSub: '基于 Pollinations AI 官方 BYOP 授权流程 · 用你自己的 Pollen 额度生成图片',
+      sizeHint: '模型支持 256x256 ~ 2048x2048，超大尺寸可能被模型限制或耗时更长。',
+      byopSummary: '或：直接粘贴 sk_ 密钥（仅开发 / 自用，非官方推荐）', apiKeyLabel: 'API Key（sk_ 开头）', apiKeyPh: '粘贴 sk_ 密钥，仅存本机浏览器', keyNotSet: '未填写。', keySaved: '密钥已保存到本机浏览器（备用路径）。', byopHint: '前端直接放 sk_ 主密钥不安全，生产环境请改用上面的官方 BYOP 授权。',
+      dlBtn: '下载图片', regenBtn: '换一张', imgMetaPrefix: '尺寸', promptLabelMeta: '提示词：', autoTranslated: '已自动译成英文（基于所在地区）', origPrompt: '原文：', transPrompt: '译文：',
+      modelTag: '模型', done: '生成于'
     },
     en: {
       labelPrompt: 'Prompt', btnLang: 'EN', btnGen: 'Generate', btnGenBusy: 'Generating…', btnTrans: 'Translating…',
@@ -512,7 +531,12 @@
       orientSquare: 'Square', orientPortrait: 'Portrait', orientLandscape: 'Landscape',
       randomBtn: 'Random', show: 'Show', hide: 'Hide',
       refMath: 'Math Chart', refDev: 'Dev Chart', refWuxia: 'Wuxia Art', refFengtian: 'Fengtian', refDao: 'Sword of God', refArray: 'White Array',
-      refMathF: 'Math Infographic', refDevF: 'Dev Infographic', refWuxiaF: 'Wuxia Poster', refFengtianF: 'Fengtian Poster', refDaoF: 'God Sword Poster', refArrayF: 'White-Robe Array'
+      refMathF: 'Math Infographic', refDevF: 'Dev Infographic', refWuxiaF: 'Wuxia Poster', refFengtianF: 'Fengtian Poster', refDaoF: 'God Sword Poster', refArrayF: 'White-Robe Array',
+      appTitle: 'Pollen Image Studio', appSub: 'Official Pollinations BYOP flow · generate with your own Pollen credits',
+      sizeHint: 'Models support 256x256 ~ 2048x2048; very large sizes may be limited or slower.',
+      byopSummary: 'Or paste an sk_ key (dev / personal use only, not officially recommended)', apiKeyLabel: 'API Key (sk_ …)', apiKeyPh: 'Paste sk_ key, kept only in this browser', keyNotSet: 'Not set.', keySaved: 'Key saved in this browser (fallback path).', byopHint: 'Exposing a full sk_ key in frontend is unsafe; use the official BYOP authorization above in production.',
+      dlBtn: 'Download', regenBtn: 'Regenerate', imgMetaPrefix: 'Size', promptLabelMeta: 'Prompt: ', autoTranslated: 'Auto-translated to English (based on your region)', origPrompt: 'Original: ', transPrompt: 'Translated: ',
+      modelTag: 'Model', done: 'at'
     }
   };
   var uiLang = localStorage.getItem(LANG_STORE) === 'en' ? 'en' : 'zh';
@@ -535,10 +559,17 @@
     if ($('randomBtn')) $('randomBtn').textContent = L.randomBtn;
     var tk = $('toggleKey');
     if (tk) tk.textContent = apiKeyEl && apiKeyEl.type === 'password' ? L.show : L.hide;
+    if ($('appTitle')) $('appTitle').textContent = L.appTitle;
+    if ($('appSub')) $('appSub').textContent = L.appSub;
+    if ($('sizeHint')) $('sizeHint').textContent = L.sizeHint;
+    if ($('byopSummary')) $('byopSummary').textContent = L.byopSummary;
+    if ($('apiKeyLabel')) $('apiKeyLabel').textContent = L.apiKeyLabel;
+    if (apiKeyEl) apiKeyEl.placeholder = L.apiKeyPh;
+    if ($('byopHint')) $('byopHint').textContent = L.byopHint;
     buildModelGrid();
     buildSizeRow();
     buildRefGrid();
-    document.title = uiLang === 'en' ? 'Pollen Image Studio' : 'Pollen 生图工坊';
+    document.title = L.appTitle;
   }
 
   // ---------------- 初始化 ----------------
@@ -567,7 +598,7 @@
 
     $('randomBtn').addEventListener('click', function () {
       var it = REF_PROMPTS[Math.floor(Math.random() * REF_PROMPTS.length)];
-      promptEl.value = it.p;
+      promptEl.value = (uiLang === 'en' && it.pe) ? it.pe : it.p;
       promptEl.focus();
     });
 
@@ -673,7 +704,7 @@
       c.textContent = t(it.key);
       c.title = t(it.fullKey) || t(it.key);
       c.addEventListener('click', function () {
-        promptEl.value = it.p;
+        promptEl.value = (uiLang === 'en' && it.pe) ? it.pe : it.p;
         promptEl.focus();
       });
       g.appendChild(c);
@@ -692,7 +723,7 @@
   }
   function setKeyState(ok) {
     keyDot.className = 'status-dot ' + (ok ? 'st-ok' : 'st-idle');
-    keyStatus.textContent = ok ? '密钥已保存到本机浏览器（备用路径）。' : '未填写。';
+    keyStatus.textContent = ok ? t('keySaved') : t('keyNotSet');
   }
 
   // 登录模态框显隐
@@ -876,14 +907,14 @@
     var ext = mime.indexOf('png') >= 0 ? 'png' : (mime.indexOf('svg') >= 0 ? 'svg' : (mime.indexOf('webp') >= 0 ? 'webp' : 'jpg'));
 
     resultBox.innerHTML =
-      '<div class="img-box"><img src="' + dataUrl + '" alt="生成结果"></div>' +
+      '<div class="img-box"><img src="' + dataUrl + '" alt="result"></div>' +
       '<div class="result-actions">' +
         '<span class="model-tag">' + escapeHtml(model) + '</span>' +
-        '<button class="btn btn-primary btn-sm" id="dlBtn">下载图片</button>' +
-        '<button class="btn btn-soft btn-sm" id="regenBtn">换一张</button>' +
+        '<button class="btn btn-primary btn-sm" id="dlBtn">' + t('dlBtn') + '</button>' +
+        '<button class="btn btn-soft btn-sm" id="regenBtn">' + t('regenBtn') + '</button>' +
       '</div>' +
-      '<div class="img-meta">尺寸 ' + state.size + ' · ' + ext.toUpperCase() + ' · 生成于 ' + now.toLocaleTimeString() +
-      (translated ? '<br><span style="color:#5cc9a3;font-weight:700">已自动译成英文（基于所在地区）</span><br>原文：' + escapeHtml(prompt) + '<br>译文：' + escapeHtml(finalPrompt) : '<br>提示词：' + escapeHtml(prompt)) +
+      '<div class="img-meta">' + t('imgMetaPrefix') + ' ' + state.size + ' · ' + ext.toUpperCase() + ' · ' + t('done') + ' ' + now.toLocaleTimeString() +
+      (translated ? '<br><span style="color:#5cc9a3;font-weight:700">' + t('autoTranslated') + '</span><br>' + t('origPrompt') + escapeHtml(prompt) + '<br>' + t('transPrompt') + escapeHtml(finalPrompt) : '<br>' + t('promptLabelMeta') + escapeHtml(prompt)) +
       '</div>';
 
     $('dlBtn').addEventListener('click', function () {
@@ -897,7 +928,7 @@
     $('regenBtn').addEventListener('click', onGenerate);
     if (item.revised_prompt && item.revised_prompt !== prompt) {
       var meta = resultBox.querySelector('.img-meta');
-      if (meta) meta.insertAdjacentHTML('beforeend', '<br>模型修订提示词：' + escapeHtml(item.revised_prompt));
+      if (meta) meta.insertAdjacentHTML('beforeend', '<br>' + t('modelTag') + ' revised prompt: ' + escapeHtml(item.revised_prompt));
     }
   }
 
