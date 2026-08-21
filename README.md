@@ -1,6 +1,6 @@
-# Sunflower Studio
+# Pollen Image Studio
 
-**Sunflower Studio** is a single-file web app for generating images with the
+**Pollen Image Studio** is a single-file web app for generating images with the
 [Pollinations AI](https://pollinations.ai) image API, using the official
 **BYOP (Bring Your Own Pollen)** OAuth flow — you sign in with your own
 Pollinations account and spend **your own Pollen credits**.
